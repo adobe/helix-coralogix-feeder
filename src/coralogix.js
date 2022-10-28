@@ -25,7 +25,7 @@ const LOG_LEVEL_MAPPING = {
 };
 
 export class CoralogixLogger {
-  constructor(apiKey, logGroup, appName, opts = {}) {
+  constructor(apiKey, funcName, appName, opts = {}) {
     const {
       apiUrl = 'https://api.coralogix.com/api/v1/',
     } = opts;
@@ -35,8 +35,8 @@ export class CoralogixLogger {
     this._apiUrl = apiUrl;
     this._host = hostname();
 
-    const [,,, longFuncName] = logGroup.split('/');
-    [this._subsystem, this._funcName] = longFuncName.split('--');
+    this._funcName = funcName;
+    [, this._subsystem] = funcName.split('/');
   }
 
   async sendEntries(entries) {

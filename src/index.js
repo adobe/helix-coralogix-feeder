@@ -15,6 +15,7 @@ import wrap from '@adobe/helix-shared-wrap';
 import { wrap as status } from '@adobe/helix-status';
 import { Response } from '@adobe/fetch';
 import { CoralogixLogger } from './coralogix.js';
+import { resolve } from './alias.js';
 
 const gunzip = util.promisify(zlib.gunzip);
 
@@ -45,7 +46,12 @@ async function run(request, context) {
   const input = JSON.parse(uncompressed.toString());
   log.info(`Received ${input.logEvents.length} events for ${input.logGroup}`);
 
-  const logger = new CoralogixLogger(apiKey, input.logGroup, app);
+  const [,,, funcName] = input.logGroup.split('/');
+  const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[(\d+)\]\w+/);
+  const alias = await resolve(context, funcName, funcVersion);
+  const [packageName, serviceName] = funcName.split('--');
+
+  const logger = new CoralogixLogger(apiKey, `/${packageName}/${serviceName}/${alias ?? funcVersion}`, app);
   const resp = await logger.sendEntries(input.logEvents);
 
   if (!resp.ok) {

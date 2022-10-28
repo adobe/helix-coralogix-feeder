@@ -30,6 +30,14 @@ describe('Index Tests', () => {
     nock.done();
   });
 
+  const env = {
+    AWS_REGION: 'us-east-1',
+    AWS_ACCESS_KEY_ID: 'aws-access-key-id',
+    AWS_SECRET_ACCESS_KEY: 'aws-secret-access-key',
+    AWS_SESSION_TOKEN: 'aws-session-token',
+    CORALOGIX_API_KEY: 'api-key',
+  };
+
   it('invokes index without payload', async () => {
     const resp = await main(new Request('https://localhost/'), {
       invocation: {
@@ -38,13 +46,24 @@ describe('Index Tests', () => {
       func: {
         app: 'my-app',
       },
-      env: {},
+      env,
     });
     assert.strictEqual(resp.status, 204);
   });
 
   it('invokes index with payload', async () => {
     const payload = 'H4sIAAFPWWMAA92WS2/bMAzH7/0UQc51QlKiROVWYGmxw7ZDe1pTFIqtpAYSJ7OdNkPR7z45rz62AgnaDth8ksCHqD9/oHx/1Ipfexqqyo/Dxc95aPda7U8nFyfXX/rn5ydn/fbx2mV2V4SyMSKKVmwMoXZb42Q2Pitni3lj7/q7qjvx02Hmuzdhki+TKpS3eRqqJMmLLCxjmsew87oMftrEERB1EbrE3Utj1JVYG0ZG+5DZVLMBMZkGj1kw6LWk6TZJtRhWaZnP63xWnOaTOpRVTHe5Mq4cNocmTx3bK/PVYx3921DUzwPvd6t1mqypUlk0IgrYoGU2UQjUBqyQdUhaIWpCg+IAxLHRwspFM2yV2mWr86h57aeNZGiMsSAA7IRe+G06sxUoQUiIL1D3yPQ0d2LA90GN3mvnCJPUDSXRgGniRsonIyInzg+FgQf156+n3wZ1Oit9vG++7LVGk0V1kxfjFrbmociaVRl+LGJdVafTGRQvaw7LuvRpHbLTPEyyRqznEq2dGiGbct963CrbxuF6Lf4+9/xTlqdivypj+1ncw273cLwvEUopcSJMyoJiIGTWAmgF2ZEWJEUKrRW2ELd7EWGA1SFEmA4wvgMR8FuLWtmsCB8Ixd4n/j0u1mK+lQvTdFwp5Dg4kYUYnVgyBhxqceSs5mZSRHBiuzXqfbjAmEsO4IKxEwMiF5lFZ0MKCXqkqJTNElGpTtg3I8t7TjX8D5Nin3seTsRGxrcT4WKflbEkBBxfiPi6WbSKHVojSki0Fgsa4jMYzS/RfYUI4gOJILbvQMS/NSk+jItGzFe5WP9sHD0c/QIdNIXebwkAAA==';
+
+    nock('https://lambda.us-east-1.amazonaws.com')
+      .get('/2015-03-31/functions/helix-services--indexer/aliases?FunctionVersion=663')
+      .reply(200, {
+        Aliases: [{
+          Name: 'v4',
+        }, {
+          Name: '4_3_47',
+        }],
+      });
+
     nock('https://api.coralogix.com')
       .post('/api/v1/logs')
       .reply((_, body) => {
@@ -56,7 +75,7 @@ describe('Index Tests', () => {
             timestamp: 1666708005982,
             text: JSON.stringify({
               inv: {
-                functionName: 'indexer',
+                functionName: '/helix-services/indexer/v4',
                 requestId: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
               },
               message: 'coralogix: flushing 1 pending requests...\n',
@@ -68,7 +87,7 @@ describe('Index Tests', () => {
             timestamp: 1666708006053,
             text: JSON.stringify({
               inv: {
-                functionName: 'indexer',
+                functionName: '/helix-services/indexer/v4',
                 requestId: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
               },
               message: 'coralogix: flushing 0 pending requests done.\n',
@@ -80,7 +99,7 @@ describe('Index Tests', () => {
             timestamp: 1666708011188,
             text: JSON.stringify({
               inv: {
-                functionName: 'indexer',
+                functionName: '/helix-services/indexer/v4',
                 requestId: 'd7197ec0-1a12-407d-83c4-5a8900aa5c40',
               },
               message: 'coralogix: flushing 1 pending requests...\n',
@@ -92,7 +111,7 @@ describe('Index Tests', () => {
             timestamp: 1666708011258,
             text: JSON.stringify({
               inv: {
-                functionName: 'indexer',
+                functionName: '/helix-services/indexer/v4',
                 requestId: 'd7197ec0-1a12-407d-83c4-5a8900aa5c40',
               },
               message: 'coralogix: flushing 0 pending requests done.\n',
@@ -101,7 +120,7 @@ describe('Index Tests', () => {
             }),
             severity: 3,
           }],
-          privateKey: 'foo-id',
+          privateKey: env.CORALOGIX_API_KEY,
           subsystemName: 'helix-services',
         });
         return [200];
@@ -118,11 +137,65 @@ describe('Index Tests', () => {
       func: {
         app: 'my-app',
       },
-      env: {
-        CORALOGIX_API_KEY: 'foo-id',
-      },
+      env,
     });
     assert.strictEqual(resp.status, 200, await resp.text());
+  });
+
+  it('defaults to function version if no alias is available', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [{
+        extractedFields: {
+          event: 'INFO\tmessage\n',
+          request_id: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
+          timestamp: '2022-10-25T14:26:45.982Z',
+        },
+        timestamp: 1666708005982,
+      }],
+      logGroup: '/aws/lambda/services--func',
+      logStream: '2022/10/28/[356]dbbf94bd5cb34f00aa764103d8ed78f2',
+    }))).toString('base64');
+
+    nock('https://lambda.us-east-1.amazonaws.com')
+      .get('/2015-03-31/functions/services--func/aliases?FunctionVersion=356')
+      .reply(200, {
+        Aliases: [],
+      });
+
+    nock('https://api.coralogix.com/api/v1/')
+      .post('/logs')
+      .reply((_, body) => {
+        assert.deepStrictEqual(body.logEntries, [{
+          timestamp: 1666708005982,
+          text: JSON.stringify({
+            inv: {
+              functionName: '/services/func/356',
+              requestId: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
+            },
+            message: 'message\n',
+            level: 'info',
+            timestamp: '2022-10-25T14:26:45.982Z',
+          }),
+          severity: 3,
+        }]);
+        return [200];
+      });
+
+    const resp = await main(new Request('https://localhost/'), {
+      invocation: {
+        event: {
+          awslogs: {
+            data: payload,
+          },
+        },
+      },
+      func: {
+        app: 'my-app',
+      },
+      env,
+    });
+
+    assert.strictEqual(resp.status, 200);
   });
 
   it('returns error when posting fails', async () => {
@@ -134,7 +207,18 @@ describe('Index Tests', () => {
         },
       }],
       logGroup: '/aws/lambda/services--func',
+      logStream: '2022/10/28/[356]dbbf94bd5cb34f00aa764103d8ed78f2',
     }))).toString('base64');
+
+    nock('https://lambda.us-east-1.amazonaws.com')
+      .get('/2015-03-31/functions/services--func/aliases?FunctionVersion=356')
+      .reply(200, {
+        Aliases: [{
+          Name: 'v4',
+        }, {
+          Name: '4_3_47',
+        }],
+      });
 
     nock('https://api.coralogix.com/api/v1/')
       .post('/logs')
@@ -151,9 +235,7 @@ describe('Index Tests', () => {
       func: {
         app: 'my-app',
       },
-      env: {
-        CORALOGIX_API_KEY: 'foo-id',
-      },
+      env,
     });
 
     assert.strictEqual(resp.status, 500);

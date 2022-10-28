@@ -32,7 +32,7 @@ describe('Coralogix Tests', () => {
         assert.strictEqual(body.logEntries.length, 1);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/aws/lambda/services--func', 'app', {
+    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
       apiUrl: 'https://www.example.com/',
     });
     const resp = await logger.sendEntries([{
@@ -48,7 +48,7 @@ describe('Coralogix Tests', () => {
     nock('https://api.coralogix.com/api/v1/')
       .post('/logs')
       .replyWithError('that went wrong');
-    const logger = new CoralogixLogger('foo-id', '/aws/lambda/services--func', 'app');
+    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app');
     const resp = await logger.sendEntries([{
       timestamp: Date.now(),
       extractedFields: {
