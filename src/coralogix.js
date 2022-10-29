@@ -49,7 +49,7 @@ export class CoralogixLogger {
             invocationId: extractedFields.request_id || 'n/a',
             functionName: this._funcName,
           },
-          message,
+          message: message.replace(/\n+$/, ''),
           level: level.toLowerCase(),
           timestamp: extractedFields.timestamp,
         }),
