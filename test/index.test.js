@@ -36,6 +36,7 @@ describe('Index Tests', () => {
     AWS_SECRET_ACCESS_KEY: 'aws-secret-access-key',
     AWS_SESSION_TOKEN: 'aws-session-token',
     CORALOGIX_API_KEY: 'api-key',
+    CORALOGIX_LEVEL: 'info',
   };
 
   it('invokes index without payload', async () => {
@@ -144,14 +145,24 @@ describe('Index Tests', () => {
 
   it('defaults to function version if no alias is available', async () => {
     const payload = (await gzip(JSON.stringify({
-      logEvents: [{
-        extractedFields: {
-          event: 'INFO\tthis\nis\na\nmessage\n',
-          request_id: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
-          timestamp: '2022-10-25T14:26:45.982Z',
+      logEvents: [
+        {
+          extractedFields: {
+            event: 'INFO\tthis\nis\na\nmessage\n',
+            request_id: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
+            timestamp: '2022-10-25T14:26:45.982Z',
+          },
+          timestamp: 1666708005982,
         },
-        timestamp: 1666708005982,
-      }],
+        {
+          extractedFields: {
+            event: 'DEBUG\tlirum\nlarum\n',
+            request_id: '1aa49921-c9b8-401c-9f3a-f22989ab8506',
+            timestamp: '2022-10-25T14:26:45.983Z',
+          },
+          timestamp: 1666708005983,
+        },
+      ],
       logGroup: '/aws/lambda/services--func',
       logStream: '2022/10/28/[356]dbbf94bd5cb34f00aa764103d8ed78f2',
     }))).toString('base64');

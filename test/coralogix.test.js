@@ -29,18 +29,32 @@ describe('Coralogix Tests', () => {
     nock('https://www.example.com')
       .post('/logs')
       .reply((_, body) => {
-        assert.strictEqual(body.logEntries.length, 1);
+        assert.deepStrictEqual(body.logEntries, [{
+          severity: 3,
+          text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"this should end up as INFO message","level":"bleep"}',
+          timestamp: 1668084827204,
+        }]);
         return [200];
       });
     const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
       apiUrl: 'https://www.example.com/',
+      level: 'chatty',
     });
-    const resp = await logger.sendEntries([{
-      timestamp: Date.now(),
-      extractedFields: {
-        event: 'BLEEP\tsomething happened\n',
+    const date = new Date('2022-11-10T12:53:47.204Z');
+    const resp = await logger.sendEntries([
+      {
+        timestamp: date.getTime(),
+        extractedFields: {
+          event: 'BLEEP\tthis should end up as INFO message\n',
+        },
       },
-    }]);
+      {
+        timestamp: date.getTime(),
+        extractedFields: {
+          event: 'DEBUG\tthis should not be visible\n',
+        },
+      },
+    ]);
     assert.strictEqual(resp.status, 200, await resp.text());
   });
 

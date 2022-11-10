@@ -30,6 +30,7 @@ async function run(request, context) {
     invocation: { event },
     env: {
       CORALOGIX_API_KEY: apiKey,
+      CORALOGIX_LOG_LEVEL: level = 'info',
     },
     func: {
       app,
@@ -52,7 +53,12 @@ async function run(request, context) {
     const alias = await resolve(context, funcName, funcVersion);
     const [packageName, serviceName] = funcName.split('--');
 
-    const logger = new CoralogixLogger(apiKey, `/${packageName}/${serviceName}/${alias ?? funcVersion}`, app);
+    const logger = new CoralogixLogger(
+      apiKey,
+      `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
+      app,
+      { level },
+    );
     const resp = await logger.sendEntries(input.logEvents);
 
     if (!resp.ok) {

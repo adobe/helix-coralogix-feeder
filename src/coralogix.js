@@ -28,12 +28,14 @@ export class CoralogixLogger {
   constructor(apiKey, funcName, appName, opts = {}) {
     const {
       apiUrl = 'https://api.coralogix.com/api/v1/',
+      level = 'info',
     } = opts;
 
     this._apiKey = apiKey;
     this._appName = appName;
     this._apiUrl = apiUrl;
     this._host = hostname();
+    this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
 
     this._funcName = funcName;
     [, this._subsystem] = funcName.split('/');
@@ -55,7 +57,7 @@ export class CoralogixLogger {
         }),
         severity: LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO,
       };
-    });
+    }).filter(({ severity }) => severity >= this._severity);
     const payload = {
       privateKey: this._apiKey,
       applicationName: this._appName,
