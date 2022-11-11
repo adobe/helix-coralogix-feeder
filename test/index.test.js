@@ -82,6 +82,7 @@ describe('Index Tests', () => {
               message: 'coralogix: flushing 1 pending requests...',
               level: 'info',
               timestamp: '2022-10-25T14:26:45.982Z',
+              logStream: '2022/10/25/[663]877ef64aed7c456086d40a1de61a48cc',
             }),
             severity: 3,
           }, {
@@ -94,6 +95,7 @@ describe('Index Tests', () => {
               message: 'coralogix: flushing 0 pending requests done.',
               level: 'info',
               timestamp: '2022-10-25T14:26:46.051Z',
+              logStream: '2022/10/25/[663]877ef64aed7c456086d40a1de61a48cc',
             }),
             severity: 3,
           }, {
@@ -106,6 +108,7 @@ describe('Index Tests', () => {
               message: 'coralogix: flushing 1 pending requests...',
               level: 'info',
               timestamp: '2022-10-25T14:26:51.188Z',
+              logStream: '2022/10/25/[663]877ef64aed7c456086d40a1de61a48cc',
             }),
             severity: 3,
           }, {
@@ -118,6 +121,7 @@ describe('Index Tests', () => {
               message: 'coralogix: flushing 0 pending requests done.',
               level: 'info',
               timestamp: '2022-10-25T14:26:51.257Z',
+              logStream: '2022/10/25/[663]877ef64aed7c456086d40a1de61a48cc',
             }),
             severity: 3,
           }],
@@ -186,6 +190,7 @@ describe('Index Tests', () => {
             message: 'this\nis\na\nmessage',
             level: 'info',
             timestamp: '2022-10-25T14:26:45.982Z',
+            logStream: '2022/10/28/[356]dbbf94bd5cb34f00aa764103d8ed78f2',
           }),
           severity: 3,
         }]);

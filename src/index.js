@@ -57,7 +57,7 @@ async function run(request, context) {
       apiKey,
       `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
       app,
-      { level },
+      { level, logStream: input.logStream },
     );
     const resp = await logger.sendEntries(input.logEvents);
 

@@ -29,6 +29,7 @@ export class CoralogixLogger {
     const {
       apiUrl = 'https://api.coralogix.com/api/v1/',
       level = 'info',
+      logStream,
     } = opts;
 
     this._apiKey = apiKey;
@@ -36,6 +37,7 @@ export class CoralogixLogger {
     this._apiUrl = apiUrl;
     this._host = hostname();
     this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
+    this._logStream = logStream;
 
     this._funcName = funcName;
     [, this._subsystem] = funcName.split('/');
@@ -44,17 +46,21 @@ export class CoralogixLogger {
   async sendEntries(entries) {
     const logEntries = entries.map(({ timestamp, extractedFields }) => {
       const [level, message] = extractedFields.event.split('\t');
+      const text = {
+        inv: {
+          invocationId: extractedFields.request_id || 'n/a',
+          functionName: this._funcName,
+        },
+        message: message.trimEnd(),
+        level: level.toLowerCase(),
+        timestamp: extractedFields.timestamp,
+      };
+      if (this._logStream) {
+        text.logStream = this._logStream;
+      }
       return {
         timestamp,
-        text: JSON.stringify({
-          inv: {
-            invocationId: extractedFields.request_id || 'n/a',
-            functionName: this._funcName,
-          },
-          message: message.trimEnd(),
-          level: level.toLowerCase(),
-          timestamp: extractedFields.timestamp,
-        }),
+        text: JSON.stringify(text),
         severity: LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO,
       };
     }).filter(({ severity }) => severity >= this._severity);
