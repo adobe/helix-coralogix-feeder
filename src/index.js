@@ -11,6 +11,7 @@
  */
 import util from 'util';
 import zlib from 'zlib';
+import { Response } from '@adobe/fetch';
 import wrap from '@adobe/helix-shared-wrap';
 import { wrap as status } from '@adobe/helix-status';
 import { CoralogixLogger } from './coralogix.js';
@@ -40,7 +41,7 @@ async function run(request, context) {
 
   if (!event?.awslogs?.data) {
     log.info('No AWS logs payload in event');
-    return;
+    return new Response('', { status: 204 });
   }
 
   let input;
@@ -63,6 +64,7 @@ async function run(request, context) {
       { level, logStream: input.logStream },
     );
     await logger.sendEntries(input.logEvents);
+    return new Response('', { status: 202 });
   } catch (e) {
     log.error(e.message);
 
