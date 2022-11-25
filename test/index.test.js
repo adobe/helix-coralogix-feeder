@@ -20,6 +20,15 @@ import { Nock } from './utils.js';
 
 const gzip = util.promisify(zlib.gzip);
 
+const DEFAULT_ENV = {
+  AWS_REGION: 'us-east-1',
+  AWS_ACCESS_KEY_ID: 'aws-access-key-id',
+  AWS_SECRET_ACCESS_KEY: 'aws-secret-access-key',
+  AWS_SESSION_TOKEN: 'aws-session-token',
+  CORALOGIX_API_KEY: 'api-key',
+  CORALOGIX_LEVEL: 'info',
+};
+
 describe('Index Tests', () => {
   let nock;
   beforeEach(() => {
@@ -30,28 +39,30 @@ describe('Index Tests', () => {
     nock.done();
   });
 
-  const env = {
-    AWS_REGION: 'us-east-1',
-    AWS_ACCESS_KEY_ID: 'aws-access-key-id',
-    AWS_SECRET_ACCESS_KEY: 'aws-secret-access-key',
-    AWS_SESSION_TOKEN: 'aws-session-token',
-    CORALOGIX_API_KEY: 'api-key',
-    CORALOGIX_LEVEL: 'info',
-  };
-  const log = console;
+  const createContext = (data, env = DEFAULT_ENV) => ({
+    invocation: {
+      event: {
+        awslogs: {
+          data,
+        },
+      },
+    },
+    runtime: {
+      region: 'us-east-1',
+      accountId: 'account-id',
+    },
+    func: {
+      app: 'aws-account-id',
+      name: 'coralogix-feeder',
+    },
+    env,
+    log: console,
+  });
 
   it('invokes index without payload', async () => {
-    const resp = await main(new Request('https://localhost/'), {
-      invocation: {
-        event: {},
-      },
-      func: {
-        app: 'my-app',
-      },
-      env,
-      log,
-    });
-    assert.strictEqual(resp.status, 204);
+    await assert.doesNotReject(
+      async () => main(new Request('https://localhost/'), createContext()),
+    );
   });
 
   it('invokes index with payload', async () => {
@@ -73,7 +84,7 @@ describe('Index Tests', () => {
         // eslint-disable-next-line no-param-reassign
         delete body.computerName;
         assert.deepStrictEqual(body, {
-          applicationName: 'my-app',
+          applicationName: 'aws-account-id',
           logEntries: [{
             timestamp: 1666708005982,
             text: JSON.stringify({
@@ -127,27 +138,15 @@ describe('Index Tests', () => {
             }),
             severity: 3,
           }],
-          privateKey: env.CORALOGIX_API_KEY,
+          privateKey: DEFAULT_ENV.CORALOGIX_API_KEY,
           subsystemName: 'helix-services',
         });
         return [200];
       });
 
-    const resp = await main(new Request('https://localhost/'), {
-      invocation: {
-        event: {
-          awslogs: {
-            data: payload,
-          },
-        },
-      },
-      func: {
-        app: 'my-app',
-      },
-      env,
-      log,
-    });
-    assert.strictEqual(resp.status, 200, await resp.text());
+    await assert.doesNotReject(
+      async () => main(new Request('https://localhost/'), createContext(payload)),
+    );
   });
 
   it('defaults to function version if no alias is available', async () => {
@@ -200,22 +199,30 @@ describe('Index Tests', () => {
         return [200];
       });
 
-    const resp = await main(new Request('https://localhost/'), {
-      invocation: {
-        event: {
-          awslogs: {
-            data: payload,
-          },
-        },
-      },
-      func: {
-        app: 'my-app',
-      },
-      env,
-      log,
-    });
+    await assert.doesNotReject(
+      async () => main(new Request('https://localhost/'), createContext(payload)),
+    );
+  });
 
-    assert.strictEqual(resp.status, 200);
+  it('returns error when uncompressing fails', async () => {
+    const payload = 'this is not compressed'.toString('base64');
+
+    nock('https://sqs.us-east-1.amazonaws.com')
+      .post('/')
+      .reply(200, `<?xml version="1.0"?>
+<SendMessageResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+  <SendMessageResult>
+    <MessageId>id</MessageId>
+  </SendMessageResult>
+  <ResponseMetadata>
+    <RequestId>id</RequestId>
+  </ResponseMetadata>
+</SendMessageResponse>
+`);
+    await assert.rejects(
+      async () => main(new Request('https://localhost/'), createContext(payload)),
+      /incorrect header check/,
+    );
   });
 
   it('returns error when environment is bad', async () => {
@@ -230,25 +237,9 @@ describe('Index Tests', () => {
       logStream: '2022/10/28/[356]dbbf94bd5cb34f00aa764103d8ed78f2',
     }))).toString('base64');
 
-    const resp = await main(new Request('https://localhost/'), {
-      invocation: {
-        event: {
-          awslogs: {
-            data: payload,
-          },
-        },
-      },
-      func: {
-        app: 'my-app',
-      },
-      env: {},
-      log,
-    });
-
-    assert.strictEqual(resp.status, 500);
-    assert.match(
-      await resp.text(),
-      /^Missing AWS configuration/,
+    await assert.rejects(
+      async () => main(new Request('https://localhost/'), createContext(payload, {})),
+      /Missing AWS configuration/,
     );
   });
 
@@ -278,22 +269,21 @@ describe('Index Tests', () => {
       .post('/logs')
       .replyWithError('that went wrong');
 
-    const resp = await main(new Request('https://localhost/'), {
-      invocation: {
-        event: {
-          awslogs: {
-            data: payload,
-          },
-        },
-      },
-      func: {
-        app: 'my-app',
-      },
-      env,
-      log,
-    });
-
-    assert.strictEqual(resp.status, 500);
-    assert.strictEqual(await resp.text(), 'that went wrong');
+    nock('https://sqs.us-east-1.amazonaws.com')
+      .post('/')
+      .reply(200, `<?xml version="1.0"?>
+<SendMessageResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+  <SendMessageResult>
+    <MessageId>id</MessageId>
+  </SendMessageResult>
+  <ResponseMetadata>
+    <RequestId>id</RequestId>
+  </ResponseMetadata>
+</SendMessageResponse>
+`);
+    await assert.rejects(
+      async () => main(new Request('https://localhost/'), createContext(payload)),
+      /that went wrong/,
+    );
   });
 });

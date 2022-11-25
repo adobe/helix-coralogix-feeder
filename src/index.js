@@ -13,9 +13,9 @@ import util from 'util';
 import zlib from 'zlib';
 import wrap from '@adobe/helix-shared-wrap';
 import { wrap as status } from '@adobe/helix-status';
-import { Response } from '@adobe/fetch';
 import { CoralogixLogger } from './coralogix.js';
 import { resolve } from './alias.js';
+import { sendToDLQ } from './dlq.js';
 
 const gunzip = util.promisify(zlib.gunzip);
 
@@ -39,13 +39,16 @@ async function run(request, context) {
   } = context;
 
   if (!event?.awslogs?.data) {
-    return new Response('', { status: 204 });
+    log.info('No AWS logs payload in event');
+    return;
   }
+
+  let input;
 
   try {
     const payload = Buffer.from(event.awslogs.data, 'base64');
     const uncompressed = await gunzip(payload);
-    const input = JSON.parse(uncompressed.toString());
+    input = JSON.parse(uncompressed.toString());
     log.info(`Received ${input.logEvents.length} events for ${input.logGroup}`);
 
     const [,,, funcName] = input.logGroup.split('/');
@@ -59,10 +62,16 @@ async function run(request, context) {
       app,
       { level, logStream: input.logStream },
     );
-    return await logger.sendEntries(input.logEvents);
+    await logger.sendEntries(input.logEvents);
   } catch (e) {
-    log.error('Unexpected failure', e);
-    return new Response(e.message, { status: 500 });
+    log.error(e.message);
+
+    try {
+      await sendToDLQ(context, input ?? { data: event.awslogs.data });
+    } catch (e2) {
+      log.error(`Unable to send to DLQ: ${e2.message}`);
+    }
+    throw e;
   }
 }
 

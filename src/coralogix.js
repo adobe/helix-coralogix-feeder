@@ -11,7 +11,7 @@
  */
 import { hostname } from 'os';
 import path from 'path';
-import { Request, Response } from '@adobe/fetch';
+import { Request } from '@adobe/fetch';
 import { fetchContext } from './support/utils.js';
 
 const LOG_LEVEL_MAPPING = {
@@ -81,21 +81,9 @@ export class CoralogixLogger {
         body: JSON.stringify(payload),
       }));
       if (!resp.ok) {
-        let msg = `Failed to send logs with status ${resp.status}: ${await resp.text()}`;
-        if (resp.status === 400) {
-          msg = `${msg}\nlogEntries: ${JSON.stringify(logEntries, 0, 2)}`;
-        }
-        return new Response(msg, { status: resp.status });
+        throw Error(`Failed to send logs with status ${resp.status}: ${await resp.text()}`);
       }
       return resp;
-    } catch (e) {
-      return new Response(e.message, {
-        status: 500,
-        headers: {
-          'content-type': 'text/plain',
-          'cache-control': 'no-store, private, must-revalidate',
-        },
-      });
       /* c8 ignore next 3 */
     } finally {
       await fetchContext.reset();
