@@ -191,7 +191,7 @@ describe('Coralogix Tests', () => {
     );
   });
 
-  it('forwards error when posting throws as many times as we have delays', async () => {
+  it('forwards error when posting throws when all delays are consumed', async () => {
     nock('https://api.coralogix.com')
       .post('/api/v1/logs')
       .twice()
