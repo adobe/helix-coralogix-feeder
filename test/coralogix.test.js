@@ -174,11 +174,29 @@ describe('Coralogix Tests', () => {
     );
   });
 
-  it('forwards error when posting throws', async () => {
+  it('retries as many times as we have delays and stops when successful', async () => {
     nock('https://api.coralogix.com')
       .post('/api/v1/logs')
+      .replyWithError('that went wrong')
+      .post('/api/v1/logs')
+      .reply(200);
+    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', { retryDelays: [1] });
+    await assert.doesNotReject(
+      async () => logger.sendEntries([{
+        timestamp: Date.now(),
+        extractedFields: {
+          event: 'INFO\tmessage\n',
+        },
+      }]),
+    );
+  });
+
+  it('forwards error when posting throws as many times as we have delays', async () => {
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .twice()
       .replyWithError('that went wrong');
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app');
+    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', { retryDelays: [1] });
     await assert.rejects(
       async () => logger.sendEntries([{
         timestamp: Date.now(),

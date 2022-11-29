@@ -9,9 +9,13 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+
+/* eslint-disable no-await-in-loop */
+
 import { hostname } from 'os';
 import path from 'path';
-import { Request } from '@adobe/fetch';
+import util from 'util';
+import { FetchError, Request } from '@adobe/fetch';
 import { fetchContext } from './support/utils.js';
 
 const LOG_LEVEL_MAPPING = {
@@ -24,11 +28,19 @@ const LOG_LEVEL_MAPPING = {
   SILLY: 1,
 };
 
+const DEFAULT_RETRY_DELAYS = [
+  // wait 5 seconds, try again, wait another 10 seconds, and try again
+  5, 10,
+];
+
+const sleep = util.promisify(setTimeout);
+
 export class CoralogixLogger {
   constructor(apiKey, funcName, appName, opts = {}) {
     const {
       apiUrl = 'https://api.coralogix.com/api/v1/',
       level = 'info',
+      retryDelays = DEFAULT_RETRY_DELAYS,
       logStream,
     } = opts;
 
@@ -37,10 +49,46 @@ export class CoralogixLogger {
     this._apiUrl = apiUrl;
     this._host = hostname();
     this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
+    this._retryDelays = retryDelays;
     this._logStream = logStream;
 
     this._funcName = funcName;
     [, this._subsystem] = funcName.split('/');
+  }
+
+  async sendPayload(payload) {
+    try {
+      const { fetch } = fetchContext;
+      const resp = await fetch(new Request(path.join(this._apiUrl, '/logs'), {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }));
+      return resp;
+      /* c8 ignore next 3 */
+    } finally {
+      await fetchContext.reset();
+    }
+  }
+
+  async sendPayloadWithRetries(payload) {
+    for (let i = 0; i <= this._retryDelays.length; i += 1) {
+      let resp;
+      try {
+        resp = await this.sendPayload(payload);
+        if (!resp.ok) {
+          throw new Error(`Failed to send logs with status ${resp.status}: ${await resp.text()}`);
+        }
+        break;
+      } catch (e) {
+        if (!(e instanceof FetchError) || i === this._retryDelays.length) {
+          throw e;
+        }
+      }
+      await sleep(this._retryDelays[i] * 1000);
+    }
   }
 
   async sendEntries(entries) {
@@ -80,21 +128,6 @@ export class CoralogixLogger {
       computerName: this._host,
       logEntries,
     };
-    try {
-      const { fetch } = fetchContext;
-      const resp = await fetch(new Request(path.join(this._apiUrl, '/logs'), {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      }));
-      if (!resp.ok) {
-        throw Error(`Failed to send logs with status ${resp.status}: ${await resp.text()}`);
-      }
-      /* c8 ignore next 3 */
-    } finally {
-      await fetchContext.reset();
-    }
+    await this.sendPayloadWithRetries(payload);
   }
 }

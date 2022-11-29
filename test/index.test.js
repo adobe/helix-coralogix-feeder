@@ -267,7 +267,7 @@ describe('Index Tests', () => {
 
     nock('https://api.coralogix.com/api/v1/')
       .post('/logs')
-      .replyWithError('that went wrong');
+      .reply(403, 'that went wrong');
 
     nock('https://sqs.us-east-1.amazonaws.com')
       .post('/')
