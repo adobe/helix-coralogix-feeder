@@ -240,10 +240,9 @@ describe('Index Tests', () => {
     const env = { ...DEFAULT_ENV };
     delete env.CORALOGIX_API_KEY;
 
-    await assert.rejects(
-      async () => main(new Request('https://localhost/'), createContext(payload, env)),
-      /No CORALOGIX_API_KEY set/,
-    );
+    const res = await main(new Request('https://localhost/'), createContext(payload, env));
+    assert.strictEqual(res.status, 500);
+    assert.strictEqual(await res.text(), 'No CORALOGIX_API_KEY set');
   });
 
   it('returns error when AWS environment is missing', async () => {

@@ -46,7 +46,7 @@ async function run(request, context) {
   if (!apiKey) {
     const msg = 'No CORALOGIX_API_KEY set';
     log.error(msg);
-    throw new Error(msg);
+    return new Response(msg, { status: 500 });
   }
 
   let input;
@@ -62,7 +62,6 @@ async function run(request, context) {
     const alias = await resolve(context, funcName, funcVersion);
     const [packageName, serviceName] = funcName.split('--');
 
-    log.info(`Using CORALOGIX_API_KEY: xxxx${apiKey.substring(apiKey.length - 4)}`);
     const logger = new CoralogixLogger(
       apiKey,
       `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
