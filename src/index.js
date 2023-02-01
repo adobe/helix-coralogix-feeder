@@ -13,7 +13,7 @@ import util from 'util';
 import zlib from 'zlib';
 import { Response } from '@adobe/fetch';
 import wrap from '@adobe/helix-shared-wrap';
-import { wrap as status } from '@adobe/helix-status';
+import { helixStatus } from '@adobe/helix-status';
 import { CoralogixLogger } from './coralogix.js';
 import { resolve } from './alias.js';
 import { sendToDLQ } from './dlq.js';
@@ -83,4 +83,4 @@ async function run(request, context) {
 }
 
 export const main = wrap(run)
-  .with(status);
+  .with(helixStatus);
