@@ -31,7 +31,7 @@ async function run(request, context) {
     invocation: { event },
     env: {
       CORALOGIX_API_KEY: apiKey,
-      CORALOGIX_SUBSYSTEM: subsystem,
+      CORALOGIX_SUBSYSTEM: subsystem = 'contentlake',
       CORALOGIX_LOG_LEVEL: level = 'info',
     },
     func: {

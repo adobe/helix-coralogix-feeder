@@ -55,6 +55,7 @@ export class CoralogixLogger {
 
     this._funcName = funcName;
     this._subsystem = subsystem || funcName.split('/')[1];
+    console.log('subsystem', this._subsystem);
   }
 
   async sendPayload(payload) {
