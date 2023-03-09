@@ -31,6 +31,7 @@ async function run(request, context) {
     invocation: { event },
     env: {
       CORALOGIX_API_KEY: apiKey,
+      CORALOGIX_SUBSYSTEM: subsystem,
       CORALOGIX_LOG_LEVEL: level = 'info',
     },
     func: {
@@ -66,7 +67,7 @@ async function run(request, context) {
       apiKey,
       `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
       app,
-      { level, logStream: input.logStream },
+      { level, logStream: input.logStream, subsystem },
     );
     await logger.sendEntries(input.logEvents);
     return new Response('', { status: 202 });

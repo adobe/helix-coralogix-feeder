@@ -42,6 +42,7 @@ export class CoralogixLogger {
       level = 'info',
       retryDelays = DEFAULT_RETRY_DELAYS,
       logStream,
+      subsystem,
     } = opts;
 
     this._apiKey = apiKey;
@@ -53,7 +54,7 @@ export class CoralogixLogger {
     this._logStream = logStream;
 
     this._funcName = funcName;
-    [, this._subsystem] = funcName.split('/');
+    this._subsystem = subsystem || funcName.split('/')[1];
   }
 
   async sendPayload(payload) {
