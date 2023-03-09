@@ -174,6 +174,35 @@ describe('Coralogix Tests', () => {
     );
   });
 
+  it('invokes constructor with customized subsystem', async () => {
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'my-services');
+        return [200];
+      });
+    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+      subsystem: 'my-services',
+    });
+    const date = new Date('2022-11-10T12:53:47.204Z');
+    await assert.doesNotReject(
+      async () => logger.sendEntries([
+        {
+          timestamp: date.getTime(),
+          extractedFields: {
+            event: 'BLEEP\tthis should end up as INFO message\n',
+          },
+        },
+        {
+          timestamp: date.getTime(),
+          extractedFields: {
+            event: 'DEBUG\tthis should not be visible\n',
+          },
+        },
+      ]),
+    );
+  });
+
   it('retries as many times as we have delays and stops when successful', async () => {
     nock('https://api.coralogix.com')
       .post('/api/v1/logs')

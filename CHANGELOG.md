@@ -1,3 +1,87 @@
+# [1.3.0](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.18...v1.3.0) (2023-03-09)
+
+
+### Features
+
+* support custom coralogix subsystem name ([#68](https://github.com/adobe/helix-coralogix-feeder/issues/68)) ([92c3992](https://github.com/adobe/helix-coralogix-feeder/commit/92c399227f4fe1353c609d99a006fffc464f1258))
+
+## [1.2.18](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.17...v1.2.18) (2023-02-14)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#59](https://github.com/adobe/helix-coralogix-feeder/issues/59)) ([c621d81](https://github.com/adobe/helix-coralogix-feeder/commit/c621d814c71aff213bd5bb621a08fd04307f8b6d))
+
+## [1.2.17](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.16...v1.2.17) (2023-02-03)
+
+
+### Bug Fixes
+
+* update to @adobe/semantic-release-coralogix@1.1.16 ([1cfdd36](https://github.com/adobe/helix-coralogix-feeder/commit/1cfdd368d021296365f98c3f104d2293013ad37d))
+
+## [1.2.16](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.15...v1.2.16) (2023-02-03)
+
+
+### Bug Fixes
+
+* update semantic-release-coralogix to 1.1.15 ([377e1dd](https://github.com/adobe/helix-coralogix-feeder/commit/377e1ddbc29d987882e70360aa435e64d42b8ea2))
+
+## [1.2.16](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.15...v1.2.16) (2023-02-03)
+
+
+### Bug Fixes
+
+* update semantic-release-coralogix to 1.1.15 ([377e1dd](https://github.com/adobe/helix-coralogix-feeder/commit/377e1ddbc29d987882e70360aa435e64d42b8ea2))
+
+## [1.2.16](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.15...v1.2.16) (2023-02-03)
+
+
+### Bug Fixes
+
+* update semantic-release-coralogix to 1.1.15 ([377e1dd](https://github.com/adobe/helix-coralogix-feeder/commit/377e1ddbc29d987882e70360aa435e64d42b8ea2))
+
+## [1.2.16](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.15...v1.2.16) (2023-02-03)
+
+
+### Bug Fixes
+
+* update semantic-release-coralogix to 1.1.15 ([377e1dd](https://github.com/adobe/helix-coralogix-feeder/commit/377e1ddbc29d987882e70360aa435e64d42b8ea2))
+
+## [1.2.16](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.15...v1.2.16) (2023-02-02)
+
+
+### Bug Fixes
+
+* update semantic-release-coralogix to 1.1.15 ([377e1dd](https://github.com/adobe/helix-coralogix-feeder/commit/377e1ddbc29d987882e70360aa435e64d42b8ea2))
+
+## [1.2.15](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.14...v1.2.15) (2023-02-02)
+
+
+### Bug Fixes
+
+* update helix-deploy to 9.0.3 ([#52](https://github.com/adobe/helix-coralogix-feeder/issues/52)) ([a76dd73](https://github.com/adobe/helix-coralogix-feeder/commit/a76dd73f4fd8f495ecf047b6a4bbc1a182449a03))
+
+## [1.2.15](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.14...v1.2.15) (2023-02-02)
+
+
+### Bug Fixes
+
+* update helix-deploy to 9.0.3 ([#52](https://github.com/adobe/helix-coralogix-feeder/issues/52)) ([a76dd73](https://github.com/adobe/helix-coralogix-feeder/commit/a76dd73f4fd8f495ecf047b6a4bbc1a182449a03))
+
+## [1.2.14](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.13...v1.2.14) (2023-02-01)
+
+
+### Bug Fixes
+
+* **deps:** update adobe major ([5a129c9](https://github.com/adobe/helix-coralogix-feeder/commit/5a129c985d8d70698ccf6e0fee486fa0571f8210))
+
+## [1.2.13](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.12...v1.2.13) (2023-01-28)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#47](https://github.com/adobe/helix-coralogix-feeder/issues/47)) ([f984e86](https://github.com/adobe/helix-coralogix-feeder/commit/f984e86b5c8c0cb5423125a1cbaff63445c3a523))
+
 ## [1.2.12](https://github.com/adobe/helix-coralogix-feeder/compare/v1.2.11...v1.2.12) (2023-01-14)
 
 

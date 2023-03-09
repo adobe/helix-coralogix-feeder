@@ -30,6 +30,7 @@ The service uses the following environment variables:
 |:------|:-------------|:---------|:--------|
 | CORALOGIX_API_KEY | Coralogix Private Key | Yes | - |
 | CORALOGIX_LOG_LEVEL | Log level | No | info |
+| CORALOGIX_SUBSYSTEM | Subsystem | No | second segment in log group name, e.g. `helix-services` |
 
 If delivery to Coralogix fails, the service will send the unprocessed messages to the AWS SQS queue named `helix-coralogix-feeder-dlq`.
 

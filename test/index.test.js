@@ -182,6 +182,7 @@ describe('Index Tests', () => {
     nock('https://api.coralogix.com/api/v1/')
       .post('/logs')
       .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'my-services');
         assert.deepStrictEqual(body.logEntries, [{
           timestamp: 1666708005982,
           text: JSON.stringify({
@@ -200,7 +201,10 @@ describe('Index Tests', () => {
       });
 
     await assert.doesNotReject(
-      async () => main(new Request('https://localhost/'), createContext(payload)),
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'my-services' }),
+      ),
     );
   });
 

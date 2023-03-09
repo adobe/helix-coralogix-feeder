@@ -13,7 +13,7 @@ import util from 'util';
 import zlib from 'zlib';
 import { Response } from '@adobe/fetch';
 import wrap from '@adobe/helix-shared-wrap';
-import { wrap as status } from '@adobe/helix-status';
+import { helixStatus } from '@adobe/helix-status';
 import { CoralogixLogger } from './coralogix.js';
 import { resolve } from './alias.js';
 import { sendToDLQ } from './dlq.js';
@@ -31,6 +31,7 @@ async function run(request, context) {
     invocation: { event },
     env: {
       CORALOGIX_API_KEY: apiKey,
+      CORALOGIX_SUBSYSTEM: subsystem,
       CORALOGIX_LOG_LEVEL: level = 'info',
     },
     func: {
@@ -66,7 +67,7 @@ async function run(request, context) {
       apiKey,
       `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
       app,
-      { level, logStream: input.logStream },
+      { level, logStream: input.logStream, subsystem },
     );
     await logger.sendEntries(input.logEvents);
     return new Response('', { status: 202 });
@@ -83,4 +84,4 @@ async function run(request, context) {
 }
 
 export const main = wrap(run)
-  .with(status);
+  .with(helixStatus);
