@@ -60,7 +60,10 @@ async function run(request, context) {
     log.info(`Received ${input.logEvents.length} events for ${input.logGroup}`);
 
     const [,,, funcName] = input.logGroup.split('/');
-    const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[(\d+)\]\w+/);
+    const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[([^\]]+)\]\w+/);
+    // const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[(\d+)\]\w+/);
+    console.log('funcVersion', funcVersion)
+    console.log('funcName', funcName)
     const alias = await resolve(context, funcName, funcVersion);
     const [packageName, serviceName] = funcName.split('--');
     console.log('serviceName', serviceName)

@@ -95,28 +95,44 @@ export class CoralogixLogger {
   }
 
   async sendEntries(entries) {
+    console.log('entries', entries);
     const logEntries = entries
-      .map(({ timestamp, extractedFields }) => {
-        let [level, message] = extractedFields.event.split('\t');
-        if (message === undefined) {
-          [level, message] = (['INFO', level]);
+      .map(({ timestamp, extractedFields, message: rawMessage }) => {
+        let text;
+        let severity = LOG_LEVEL_MAPPING.INFO;
+        if (extractedFields) {
+          let [level, message] = extractedFields.event.split('\t');
+          severity = LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO;
+          if (message === undefined) {
+            [level, message] = (['INFO', level]);
+          }
+          text = {
+            inv: {
+              invocationId: extractedFields.request_id || 'n/a',
+              functionName: this._funcName,
+            },
+            message: message.trimEnd(),
+            level: level.toLowerCase(),
+            timestamp: extractedFields.timestamp,
+          };
+        } else {
+          text = {
+            inv: {
+              // invocationId: 'n/a',
+              functionName: this._funcName,
+            },
+            message: rawMessage,
+            level: 'info', // TODO: how to get level from rawMessage?
+            timestamp: new Date(timestamp).toISOString(),
+          };
         }
-        const text = {
-          inv: {
-            invocationId: extractedFields.request_id || 'n/a',
-            functionName: this._funcName,
-          },
-          message: message.trimEnd(),
-          level: level.toLowerCase(),
-          timestamp: extractedFields.timestamp,
-        };
         if (this._logStream) {
           text.logStream = this._logStream;
         }
         return {
           timestamp,
           text: JSON.stringify(text),
-          severity: LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO,
+          severity,
         };
       })
       .filter(({ severity }) => severity >= this._severity);
