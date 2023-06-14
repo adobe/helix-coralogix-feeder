@@ -19,7 +19,7 @@ import { resolve } from './alias.js';
 import { sendToDLQ } from './dlq.js';
 
 const gunzip = util.promisify(zlib.gunzip);
-const CORALOGIX_APPLICATION_NAME = 'lambda-contentlake';
+const CORALOGIX_APPLICATION_NAME = 'lambda';
 
 /**
  * This is the main function
@@ -62,11 +62,8 @@ async function run(request, context) {
     const [,,, funcName] = input.logGroup.split('/');
     const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[([^\]]+)\]\w+/);
     // const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[(\d+)\]\w+/);
-    console.log('funcVersion', funcVersion)
-    console.log('funcName', funcName)
     const alias = await resolve(context, funcName, funcVersion);
     const [packageName, serviceName] = funcName.split('--');
-    console.log('serviceName', serviceName)
 
     const logger = new CoralogixLogger(
       apiKey,

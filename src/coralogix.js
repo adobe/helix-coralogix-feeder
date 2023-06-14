@@ -54,9 +54,7 @@ export class CoralogixLogger {
     this._logStream = logStream;
 
     this._funcName = funcName;
-    this._subsystem = `λ ${funcName.split('/')[2]}`; // subsystem is lambda function name
-    console.log('subsystem', this._subsystem);
-    console.log('funcName', this._funcName);
+    this._subsystem = funcName.split('/')[2]; // subsystem is lambda function name
   }
 
   async sendPayload(payload) {
@@ -95,7 +93,6 @@ export class CoralogixLogger {
   }
 
   async sendEntries(entries) {
-    console.log('entries', entries);
     const logEntries = entries
       .map(({ timestamp, extractedFields, message: rawMessage }) => {
         let text;
