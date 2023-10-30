@@ -43,7 +43,7 @@
   },
   "homepage": "https://github.com/adobe/helix-coralogix-feeder#readme",
   "dependencies": {
-    "@adobe/fetch": "4.1.0",
+    "@adobe/fetch": "4.1.1",
     "@adobe/helix-shared-wrap": "2.0.0",
     "@adobe/helix-status": "10.0.10",
     "aws4": "1.12.0"
