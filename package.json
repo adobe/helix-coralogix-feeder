@@ -1,6 +1,6 @@
 {
   "name": "@adobe/helix-coralogix-feeder",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "private": true,
   "description": "Franklin Coralogix Feeder",
   "main": "src/index.js",
