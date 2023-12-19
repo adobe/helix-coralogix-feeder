@@ -1,5 +1,5 @@
 {
-  "name": "@adobe/helix-coralogix-feeder",
+  "name": "@adobe/spacecat-coralogix-feeder",
   "version": "1.4.0",
   "private": true,
   "description": "Franklin Coralogix Feeder",
@@ -34,14 +34,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/adobe/helix-coralogix-feeder"
+    "url": "https://github.com/adobe-rnd/spacecat-coralogix-feeder"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/adobe/helix-coralogix-feeder/issues"
+    "url": "https://github.com/adobe-rnd/spacecat-coralogix-feeder/issues"
   },
-  "homepage": "https://github.com/adobe/helix-coralogix-feeder#readme",
+  "homepage": "https://github.com/adobe-rnd/spacecat-coralogix-feeder#readme",
   "dependencies": {
     "@adobe/fetch": "4.1.1",
     "@adobe/helix-shared-wrap": "2.0.0",
