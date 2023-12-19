@@ -12,7 +12,7 @@
     "semantic-release": "semantic-release",
     "commit": "git-cz",
     "build": "hedy -v",
-    "deploy": "hedy -v --deploy --test --aws-region us-east-1 --params .env",
+    "deploy": "hedy -v --deploy --test --aws-region us-east-1",
     "deploy-routes": "hedy --no-build --no-hints -l major",
     "deploy-ci": "hedy -v --deploy --test --pkgVersion=ci$CIRCLE_BUILD_NUM -l ci --cleanup-ci 24h",
     "prepare": "husky install"
