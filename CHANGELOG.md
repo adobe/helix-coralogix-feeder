@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.0...v1.4.1) (2023-12-19)
+
+
+### Bug Fixes
+
+* missing CORALOGIX_ALIAS_MAPPING should not report Error ([#194](https://github.com/adobe/helix-coralogix-feeder/issues/194)) ([4da0257](https://github.com/adobe/helix-coralogix-feeder/commit/4da0257ad4a370857f7c13782d61f555a0eb78b8))
+
 # [1.4.0](https://github.com/adobe/helix-coralogix-feeder/compare/v1.3.12...v1.4.0) (2023-12-12)
 
 
