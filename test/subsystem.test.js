@@ -54,7 +54,7 @@ describe('Log Feeder Tests', () => {
       delete context.env.CORALOGIX_ALIAS_MAPPING;
 
       const result = mapSubsystem('ci', context);
-      assert.strictEqual(result, null);
+      assert.strictEqual(result, undefined);
     });
   });
 });

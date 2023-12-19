@@ -27,7 +27,7 @@ export function mapSubsystem(alias, context) {
     return null;
   }
 
-  const { CORALOGIX_ALIAS_MAPPING: aliasMapping } = env;
+  const { CORALOGIX_ALIAS_MAPPING: aliasMapping = '{}' } = env;
 
   try {
     return JSON.parse(aliasMapping)[alias];

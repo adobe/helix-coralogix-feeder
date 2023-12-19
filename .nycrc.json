@@ -1,7 +1,8 @@
 {
   "reporter": [
     "lcov",
-    "text"
+    "text",
+    "text-summary"
   ],
   "check-coverage": true,
   "lines": 100,
