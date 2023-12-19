@@ -1,6 +1,6 @@
 {
   "name": "@adobe/spacecat-coralogix-feeder",
-  "version": "1.4.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Franklin Coralogix Feeder",
   "main": "src/index.js",
