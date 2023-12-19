@@ -12,7 +12,7 @@
     "semantic-release": "semantic-release",
     "commit": "git-cz",
     "build": "hedy -v",
-    "deploy": "hedy -v --deploy --test",
+    "deploy": "hedy -v --deploy --test --aws-region us-east-1 --params .env",
     "deploy-routes": "hedy --no-build --no-hints -l major",
     "deploy-ci": "hedy -v --deploy --test --pkgVersion=ci$CIRCLE_BUILD_NUM -l ci --cleanup-ci 24h",
     "prepare": "husky install"
@@ -20,8 +20,8 @@
   "wsk": {
     "nodeVersion": 18,
     "target": "aws",
-    "name": "helix-services/coralogix-feeder@${version}",
-    "awsRole!important": "arn:aws:iam::118435662149:role/helix-service-role-s3-rw",
+    "name": "spacecat-services/coralogix-feeder@${version}",
+    "awsRole!important": "arn:aws:iam::282898975672:role/spacecat-role-services",
     "testUrl": "/_status_check/healthcheck.json",
     "memory": 1024,
     "fastlyServiceId!important": ""
