@@ -80,7 +80,10 @@ async function run(request, context) {
       logStream: input.logStream,
       subsystem,
     });
-    await logger.sendEntries(input.logEvents);
+    const rejected = await logger.sendEntries(input.logEvents);
+    if (rejected.length) {
+      await sendToDLQ(context, rejected);
+    }
     return new Response('', { status: 202 });
   } catch (e) {
     log.error(e.message);

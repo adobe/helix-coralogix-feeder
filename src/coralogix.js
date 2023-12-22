@@ -169,7 +169,7 @@ export class CoralogixLogger {
     const fields = this.extractFields(entry);
     if (!fields) {
       log.warn(`Unable to extract fields from: ${JSON.stringify(entry, 0, 2)}`);
-      return {};
+      return null;
     }
     const { level, message, requestId } = fields;
     const text = {
@@ -192,21 +192,29 @@ export class CoralogixLogger {
   }
 
   async sendEntries(entries) {
+    const rejected = [];
     const logEntries = entries
-      .map((entry) => this.extractMessage(entry))
+      .reduce((result, entry) => {
+        const logEntry = this.extractMessage(entry);
+        if (logEntry) {
+          result.push(logEntry);
+        } else {
+          rejected.push(entry);
+        }
+        return result;
+      }, [])
       .filter(({ severity }) => severity >= this._severity);
-    if (logEntries.length === 0) {
-      return;
+    if (logEntries.length) {
+      const payload = {
+        privateKey: this._apiKey,
+        applicationName: this._appName,
+        subsystemName: this._subsystem,
+        computerName: this._host,
+        logEntries,
+      };
+      await this.sendPayloadWithRetries(payload);
     }
-
-    const payload = {
-      privateKey: this._apiKey,
-      applicationName: this._appName,
-      subsystemName: this._subsystem,
-      computerName: this._host,
-      logEntries,
-    };
-    await this.sendPayloadWithRetries(payload);
+    return rejected;
   }
 
   get log() {
