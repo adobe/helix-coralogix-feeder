@@ -33,11 +33,54 @@ const DEFAULT_RETRY_DELAYS = [
   5, 10,
 ];
 
+const MESSAGE_EXTRACTORS = [
+  {
+    pattern: /^START RequestId: ([0-9a-f-]{36}) ([\s\S]+)\n$/,
+    extract: (match) => ({
+      message: `START ${match[2]}`,
+      requestId: match[1],
+    }),
+  },
+  {
+    pattern: /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\t([0-9a-f-]{36})\t([\s\S]+)\n$/,
+    extract: (match) => {
+      let [level, message] = match[3].split('\t');
+      if (message === undefined) {
+        [level, message] = (['INFO', level]);
+      }
+      return {
+        level,
+        message,
+        requestId: match[2],
+        timestamp: match[1],
+      };
+    },
+  },
+  {
+    pattern: /^END RequestId: ([0-9a-f-]{36})\n$/,
+    extract: (match) => ({
+      message: 'END',
+      requestId: match[1],
+    }),
+  },
+  {
+    pattern: /^REPORT RequestId: ([0-9a-f-]{36})\t([\s\S]+)\n$/,
+    extract: (match) => ({
+      message: `REPORT ${match[2]}`,
+      requestId: match[1],
+    }),
+  },
+];
+
 const sleep = util.promisify(setTimeout);
 
 export class CoralogixLogger {
-  constructor(apiKey, funcName, appName, opts = {}) {
+  constructor(opts) {
     const {
+      apiKey,
+      funcName,
+      appName,
+      log = console,
       apiUrl = 'https://api.coralogix.com/api/v1/',
       level = 'info',
       retryDelays = DEFAULT_RETRY_DELAYS,
@@ -47,6 +90,7 @@ export class CoralogixLogger {
 
     this._apiKey = apiKey;
     this._appName = appName;
+    this._log = log;
     this._apiUrl = apiUrl;
     this._host = hostname();
     this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
@@ -92,31 +136,64 @@ export class CoralogixLogger {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  extractFields(entry) {
+    const { extractedFields } = entry;
+    if (extractedFields) {
+      let [level, message] = extractedFields.event.split('\t');
+      if (message === undefined) {
+        [level, message] = (['INFO', level]);
+      }
+      return {
+        level,
+        message,
+        requestId: extractedFields.request_id,
+        timestamp: extractedFields.timestamp,
+      };
+    }
+    return MESSAGE_EXTRACTORS.reduce((result, { pattern, extract }) => {
+      if (!result) {
+        const match = entry.message.match(pattern);
+        if (match) {
+          return extract(match);
+        }
+      }
+      return result;
+    }, null);
+  }
+
+  extractMessage(entry) {
+    const { timestamp } = entry;
+    const { log } = this;
+
+    const fields = this.extractFields(entry);
+    if (!fields) {
+      log.warn(`Unable to extract fields from: ${JSON.stringify(entry, 0, 2)}`);
+      return {};
+    }
+    const { level, message, requestId } = fields;
+    const text = {
+      inv: {
+        invocationId: requestId || 'n/a',
+        functionName: this._funcName,
+      },
+      message: message.trimEnd(),
+      level: (level || 'INFO').toLowerCase(),
+      timestamp: fields.timestamp,
+    };
+    if (this._logStream) {
+      text.logStream = this._logStream;
+    }
+    return {
+      timestamp,
+      text: JSON.stringify(text),
+      severity: LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO,
+    };
+  }
+
   async sendEntries(entries) {
     const logEntries = entries
-      .map(({ timestamp, extractedFields }) => {
-        let [level, message] = extractedFields.event.split('\t');
-        if (message === undefined) {
-          [level, message] = (['INFO', level]);
-        }
-        const text = {
-          inv: {
-            invocationId: extractedFields.request_id || 'n/a',
-            functionName: this._funcName,
-          },
-          message: message.trimEnd(),
-          level: level.toLowerCase(),
-          timestamp: extractedFields.timestamp,
-        };
-        if (this._logStream) {
-          text.logStream = this._logStream;
-        }
-        return {
-          timestamp,
-          text: JSON.stringify(text),
-          severity: LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO,
-        };
-      })
+      .map((entry) => this.extractMessage(entry))
       .filter(({ severity }) => severity >= this._severity);
     if (logEntries.length === 0) {
       return;
@@ -130,5 +207,9 @@ export class CoralogixLogger {
       logEntries,
     };
     await this.sendPayloadWithRetries(payload);
+  }
+
+  get log() {
+    return this._log;
   }
 }

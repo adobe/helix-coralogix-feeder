@@ -12,6 +12,8 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
+import { resolve } from 'path';
+import fs from 'fs/promises';
 import util from 'util';
 import zlib from 'zlib';
 import { Request } from '@adobe/fetch';
@@ -364,6 +366,28 @@ describe('Index Tests', () => {
     await assert.rejects(
       async () => main(new Request('https://localhost/'), createContext(payload)),
       /that went wrong/,
+    );
+  });
+
+  it('allows definining subscription filter without pattern', async () => {
+    const contents = await fs.readFile(resolve(__rootdir, 'test', 'fixtures', 'patternless.json'));
+    const { input, output } = JSON.parse(contents);
+
+    const payload = (await gzip(JSON.stringify(input))).toString('base64');
+    nock('https://api.coralogix.com/api/v1/')
+      .post('/logs')
+      .reply((_, body) => {
+        // eslint-disable-next-line no-param-reassign
+        delete body.computerName;
+        assert.deepStrictEqual(body, output);
+        return [200];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'my-services' }),
+      ),
     );
   });
 });
