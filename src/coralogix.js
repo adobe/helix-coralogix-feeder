@@ -44,7 +44,7 @@ const MESSAGE_EXTRACTORS = [
   {
     pattern: /^(START|END|REPORT) RequestId: ([0-9a-f-]{36})([\s\S]+)?\n$/,
     extract: (match) => ({
-      message: `${match[1]}${match[3]?.replace('\t', ' ') ?? ''}`,
+      message: `${match[1]}${match[3]?.replace(/^\t/, ' ') ?? ''}`,
       requestId: match[2],
       level: 'DEBUG',
     }),
