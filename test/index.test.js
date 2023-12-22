@@ -403,7 +403,11 @@ describe('Index Tests', () => {
     await assert.doesNotReject(
       async () => main(
         new Request('https://localhost/'),
-        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'my-services' }),
+        createContext(payload, {
+          ...DEFAULT_ENV,
+          CORALOGIX_SUBSYSTEM: 'my-services',
+          CORALOGIX_LOG_LEVEL: 'debug',
+        }),
       ),
     );
   });

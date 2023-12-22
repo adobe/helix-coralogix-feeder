@@ -67,13 +67,13 @@
     "logEntries": [
       {
         "timestamp": 1703249845822,
-        "text": "{\"inv\":{\"invocationId\":\"n/a\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"INIT_START Runtime Version: nodejs:18.v18\\tRuntime Version ARN: arn:aws:lambda:us-east-1::runtime:d949ec0248c1b8fbc8cbc6df1c986e05fb933506b51d53be82d46f9a37125bea}\",\"level\":\"info\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
+        "text": "{\"inv\":{\"invocationId\":\"n/a\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"INIT_START Runtime Version: nodejs:18.v18\\tRuntime Version ARN: arn:aws:lambda:us-east-1::runtime:d949ec0248c1b8fbc8cbc6df1c986e05fb933506b51d53be82d46f9a37125bea}\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+        "severity": 1
       },
       {
         "timestamp": 1703176564631,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"START Version: $LATEST\",\"level\":\"info\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
+        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"START Version: $LATEST\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+        "severity": 1
       },
       {
         "timestamp": 1703176565151,
@@ -102,13 +102,13 @@
       },
       {
         "timestamp": 1703176565293,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"END\",\"level\":\"info\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
+        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"END\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+        "severity": 1
       },
       {
         "timestamp": 1703176565293,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"REPORT Duration: 660.16 ms\\tBilled Duration: 661 ms\\tMemory Size: 128 MB\\tMax Memory Used: 73 MB\\tInit Duration: 234.44 ms\",\"level\":\"info\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
+        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"REPORT Duration: 660.16 ms\\tBilled Duration: 661 ms\\tMemory Size: 128 MB\\tMax Memory Used: 73 MB\\tInit Duration: 234.44 ms\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+        "severity": 1
       }
     ]
   }

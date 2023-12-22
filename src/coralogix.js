@@ -38,6 +38,7 @@ const MESSAGE_EXTRACTORS = [
     pattern: /^INIT_START ([\s\S]+)\n$/,
     extract: (match) => ({
       message: `INIT_START ${match[1]}}`,
+      level: 'DEBUG',
     }),
   },
   {
@@ -45,6 +46,7 @@ const MESSAGE_EXTRACTORS = [
     extract: (match) => ({
       message: `${match[1]}${match[3]?.replace('\t', ' ') ?? ''}`,
       requestId: match[2],
+      level: 'DEBUG',
     }),
   },
   {
@@ -170,7 +172,7 @@ export class CoralogixLogger {
         functionName: this._funcName,
       },
       message: message.trimEnd(),
-      level: (level || 'INFO').toLowerCase(),
+      level: level.toLowerCase(),
       timestamp: fields.timestamp,
     };
     if (this._logStream) {
