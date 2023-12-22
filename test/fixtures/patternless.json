@@ -9,6 +9,11 @@
     ],
     "logEvents": [
       {
+        "id": "37983740821112990648825400157019498252368689014705094656",
+        "timestamp": 1703249845822,
+        "message": "INIT_START Runtime Version: nodejs:18.v18\tRuntime Version ARN: arn:aws:lambda:us-east-1::runtime:d949ec0248c1b8fbc8cbc6df1c986e05fb933506b51d53be82d46f9a37125bea\n"
+      },
+      {
         "id": "37982106595944654793311527668441066160164314871147462656",
         "timestamp": 1703176564631,
         "message": "START RequestId: 576e61bb-40b7-4f8d-a6fb-da189d92c437 Version: $LATEST\n"
@@ -60,6 +65,11 @@
     "privateKey": "api-key",
     "subsystemName": "my-services",
     "logEntries": [
+      {
+        "timestamp": 1703249845822,
+        "text": "{\"inv\":{\"invocationId\":\"n/a\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"INIT_START Runtime Version: nodejs:18.v18\\tRuntime Version ARN: arn:aws:lambda:us-east-1::runtime:d949ec0248c1b8fbc8cbc6df1c986e05fb933506b51d53be82d46f9a37125bea}\",\"level\":\"info\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+        "severity": 3
+      },
       {
         "timestamp": 1703176564631,
         "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"START Version: $LATEST\",\"level\":\"info\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",

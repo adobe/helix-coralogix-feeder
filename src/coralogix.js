@@ -35,10 +35,16 @@ const DEFAULT_RETRY_DELAYS = [
 
 const MESSAGE_EXTRACTORS = [
   {
-    pattern: /^START RequestId: ([0-9a-f-]{36}) ([\s\S]+)\n$/,
+    pattern: /^INIT_START ([\s\S]+)\n$/,
     extract: (match) => ({
-      message: `START ${match[2]}`,
-      requestId: match[1],
+      message: `INIT_START ${match[1]}}`,
+    }),
+  },
+  {
+    pattern: /^(START|END|REPORT) RequestId: ([0-9a-f-]{36})([\s\S]+)?\n$/,
+    extract: (match) => ({
+      message: `${match[1]}${match[3]?.replace('\t', ' ') ?? ''}`,
+      requestId: match[2],
     }),
   },
   {
@@ -55,20 +61,6 @@ const MESSAGE_EXTRACTORS = [
         timestamp: match[1],
       };
     },
-  },
-  {
-    pattern: /^END RequestId: ([0-9a-f-]{36})\n$/,
-    extract: (match) => ({
-      message: 'END',
-      requestId: match[1],
-    }),
-  },
-  {
-    pattern: /^REPORT RequestId: ([0-9a-f-]{36})\t([\s\S]+)\n$/,
-    extract: (match) => ({
-      message: `REPORT ${match[2]}`,
-      requestId: match[1],
-    }),
   },
 ];
 
