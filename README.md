@@ -24,6 +24,17 @@ $ aws logs put-subscription-filter \
   --destination-arn 'arn:aws:lambda:<region>:<accountid>:function:helix-services--coralogix-feeder:v1'
 ```
 
+If you get an error that CloudWatch is not allowed to execute your function, add the following permission:
+```
+aws lambda add-permission \
+    --function-name 'arn:aws:lambda:<region>:<accountid>:function:helix-services--coralogix-feeder:v1' \
+    --statement-id 'CloudWatchInvokeCoralogixFeeder' \
+    --principal 'logs.amazonaws.com' \
+    --action 'lambda:InvokeFunction' \
+    --source-arn 'arn:aws:logs:<region>:<accountId>:log-group:/aws/lambda/helix-services--my-service:*' \
+    --source-account '<accountId>'
+```
+
 The service uses the following environment variables:
 
 | Name  | Description  | Required | Default |
