@@ -63,13 +63,13 @@
     "codecov": "3.8.3",
     "dotenv": "16.4.1",
     "eslint": "8.56.0",
-    "husky": "9.0.7",
-    "junit-report-builder": "3.1.0",
-    "lint-staged": "15.2.0",
+    "husky": "9.0.10",
+    "junit-report-builder": "3.2.1",
+    "lint-staged": "15.2.1",
     "mocha": "10.2.0",
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.4.1",
-    "nock": "13.5.0",
+    "nock": "13.5.1",
     "semantic-release": "22.0.12"
   },
   "lint-staged": {
