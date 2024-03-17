@@ -36,7 +36,10 @@ describe('Coralogix Tests', () => {
         }]);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       apiUrl: 'https://www.example.com/',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -69,7 +72,10 @@ describe('Coralogix Tests', () => {
         }]);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       level: 'chatty',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -102,7 +108,10 @@ describe('Coralogix Tests', () => {
         }]);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       level: 'warn',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -141,7 +150,10 @@ describe('Coralogix Tests', () => {
         }]);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       level: 'info',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -157,8 +169,11 @@ describe('Coralogix Tests', () => {
     );
   });
 
-  it('invokes constructor with higher log level, should filter all messages, and nothing sent', async () => {
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+  it('invokes constructor, should filter DEBUG messages, and nothing sent', async () => {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       level: 'info',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -181,7 +196,10 @@ describe('Coralogix Tests', () => {
         assert.strictEqual(body.subsystemName, 'my-services');
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       subsystem: 'my-services',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -209,7 +227,12 @@ describe('Coralogix Tests', () => {
       .replyWithError('that went wrong')
       .post('/api/v1/logs')
       .reply(200);
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', { retryDelays: [1] });
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
+      retryDelays: [1],
+    });
     await assert.doesNotReject(
       async () => logger.sendEntries([{
         timestamp: Date.now(),
@@ -225,7 +248,12 @@ describe('Coralogix Tests', () => {
       .post('/api/v1/logs')
       .twice()
       .replyWithError('that went wrong');
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', { retryDelays: [1] });
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
+      retryDelays: [1],
+    });
     await assert.rejects(
       async () => logger.sendEntries([{
         timestamp: Date.now(),
@@ -241,7 +269,11 @@ describe('Coralogix Tests', () => {
     nock('https://api.coralogix.com')
       .post('/api/v1/logs')
       .reply(400, 'input malformed');
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app');
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
+    });
     await assert.rejects(
       async () => logger.sendEntries([{
         timestamp: Date.now(),
