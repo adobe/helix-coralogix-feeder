@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.4...v1.4.5) (2024-05-25)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([#261](https://github.com/adobe/helix-coralogix-feeder/issues/261)) ([bd9d7f1](https://github.com/adobe/helix-coralogix-feeder/commit/bd9d7f1b69775f140609bb6ed19fac3d3af8aefe))
+
 ## [1.4.4](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.3...v1.4.4) (2024-04-17)
 
 
