@@ -1,3 +1,10 @@
+## [1.4.7](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.6...v1.4.7) (2024-06-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-status to v10.1.0 ([#266](https://github.com/adobe/helix-coralogix-feeder/issues/266)) ([6ca0e15](https://github.com/adobe/helix-coralogix-feeder/commit/6ca0e15755001a7eb6093530abedfbc2bd52d397))
+
 ## [1.4.6](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.5...v1.4.6) (2024-06-02)
 
 
