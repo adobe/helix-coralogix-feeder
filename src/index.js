@@ -36,7 +36,7 @@ async function run(request, context) {
       CORALOGIX_LOG_LEVEL: level = 'info',
     },
     func: {
-      app,
+      app: appName,
     },
     log,
   } = context;
@@ -60,7 +60,7 @@ async function run(request, context) {
     log.info(`Received ${input.logEvents.length} event(s) for [${input.logGroup}][${input.logStream}]`);
 
     const [,,, funcName] = input.logGroup.split('/');
-    const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[(\d+|\$LATEST)\]\w+/);
+    const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/[a-z-]*\[(\d+|\$LATEST)\]\w+/);
 
     let alias;
     if (funcVersion !== '$LATEST') {
@@ -71,13 +71,19 @@ async function run(request, context) {
     // Use mapped subsystem if available, else fallback to default
     const subsystem = mapSubsystem(alias ?? funcVersion, context) || defaultSubsystem;
 
-    const logger = new CoralogixLogger(
+    const logger = new CoralogixLogger({
       apiKey,
-      `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
-      app,
-      { level, logStream: input.logStream, subsystem },
-    );
-    await logger.sendEntries(input.logEvents);
+      funcName: `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
+      appName,
+      log,
+      level,
+      logStream: input.logStream,
+      subsystem,
+    });
+    const rejected = await logger.sendEntries(input.logEvents);
+    if (rejected.length) {
+      await sendToDLQ(context, rejected);
+    }
     return new Response('', { status: 202 });
   } catch (e) {
     log.error(e.message);
