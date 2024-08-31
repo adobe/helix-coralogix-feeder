@@ -49,7 +49,7 @@
     "@adobe/fetch": "4.1.8",
     "@adobe/helix-shared-wrap": "2.0.2",
     "@adobe/helix-status": "10.1.2",
-    "aws4": "1.13.1"
+    "aws4": "1.13.2"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "2.0.6",
