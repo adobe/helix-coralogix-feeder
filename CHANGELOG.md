@@ -1,3 +1,10 @@
+## [1.4.10](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.9...v1.4.10) (2024-08-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency aws4 to v1.13.2 ([#300](https://github.com/adobe/helix-coralogix-feeder/issues/300)) ([b11e51f](https://github.com/adobe/helix-coralogix-feeder/commit/b11e51f5aa6a45f5d79d14ca3a2f141287acf5a4))
+
 ## [1.4.9](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.8...v1.4.9) (2024-08-10)
 
 
