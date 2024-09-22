@@ -1,3 +1,10 @@
+## [1.4.11](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.4.10...v1.4.11) (2024-09-22)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#307](https://github.com/adobe/[secure]-coralogix-feeder/issues/307)) ([7cc241c](https://github.com/adobe/[secure]-coralogix-feeder/commit/7cc241c5585574049a478796fcea848d6bda18b9))
+
 ## [1.4.10](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.9...v1.4.10) (2024-08-31)
 
 
