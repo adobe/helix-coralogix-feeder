@@ -18,6 +18,15 @@ import util from 'util';
 import { FetchError, Request } from '@adobe/fetch';
 import { fetchContext } from './support/utils.js';
 
+/**
+ * @typedef LogEvent
+ * @property {string} id event id
+ * @property {number} timestamp timestamp
+ * @property {string} message message, which might have a variety of formats
+ * @property {string[]|undefined} extractedFields extracted fields,
+ * only present when a non-empty filter pattern has been specified
+ */
+
 const LOG_LEVEL_MAPPING = {
   ERROR: 5,
   WARN: 4,
@@ -50,6 +59,7 @@ const MESSAGE_EXTRACTORS = [
     }),
   },
   {
+    /* standard extractor corresponding to pattern [timestamp=*Z, request_id="*-*", event] */
     pattern: /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\t([0-9a-f-]{36})\t([\s\S]+)\n$/,
     extract: (match) => {
       let [level, message] = match[3].split('\t');
@@ -185,9 +195,15 @@ export class CoralogixLogger {
     };
   }
 
-  async sendEntries(entries) {
+  /**
+   * Send entries to Coralogix
+   *
+   * @param {LogEvent[]} logEvents log events
+   * @returns {Promise<LogEvent[]} rejected log entries
+   */
+  async sendEntries(logEvents) {
     const rejected = [];
-    const logEntries = entries
+    const logEntries = logEvents
       .reduce((result, entry) => {
         const logEntry = this.extractMessage(entry);
         if (logEntry) {

@@ -58,6 +58,7 @@ async function run(request, context) {
     const uncompressed = await gunzip(payload);
     input = JSON.parse(uncompressed.toString());
     log.info(`Received ${input.logEvents.length} event(s) for [${input.logGroup}][${input.logStream}]`);
+    log.debug(`Events: ${JSON.stringify(input.logEvents, 0, 2)}`);
 
     const [,,, funcName] = input.logGroup.split('/');
     const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/[a-z-]*\[(\d+|\$LATEST)\]\w+/);
