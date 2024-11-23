@@ -12,19 +12,27 @@
 
 /* eslint-disable no-await-in-loop */
 
+import { setTimeout } from 'node:timers/promises';
 import { hostname } from 'os';
 import path from 'path';
-import util from 'util';
 import { FetchError, Request } from '@adobe/fetch';
 import { fetchContext } from './support/utils.js';
+import { extractFields } from './extract-fields.js';
 
 /**
  * @typedef LogEvent
  * @property {string} id event id
  * @property {number} timestamp timestamp
  * @property {string} message message, which might have a variety of formats
- * @property {string[]|undefined} extractedFields extracted fields,
+ * @property {string} extractedFields extracted fields,
  * only present when a non-empty filter pattern has been specified
+ */
+
+/**
+ * @typedef CoralogixLogEntry
+ * @property {number} timestamp timestamp
+ * @property {string} text JSON stringified object, containing various fields
+ * @property {number} severity log level (see LOG_LEVEL_MAPPING)
  */
 
 const LOG_LEVEL_MAPPING = {
@@ -39,45 +47,12 @@ const LOG_LEVEL_MAPPING = {
 
 const DEFAULT_RETRY_DELAYS = [
   // wait 5 seconds, try again, wait another 10 seconds, and try again
-  5, 10,
+  5000, 10000,
 ];
 
-const MESSAGE_EXTRACTORS = [
-  {
-    pattern: /^INIT_START ([\s\S]+)\n$/,
-    extract: (match) => ({
-      message: `INIT_START ${match[1]}}`,
-      level: 'DEBUG',
-    }),
-  },
-  {
-    pattern: /^(START|END|REPORT) RequestId: ([0-9a-f-]{36})([\s\S]+)?\n$/,
-    extract: (match) => ({
-      message: `${match[1]}${match[3]?.replace(/^\t/, ' ') ?? ''}`,
-      requestId: match[2],
-      level: 'DEBUG',
-    }),
-  },
-  {
-    /* standard extractor corresponding to pattern [timestamp=*Z, request_id="*-*", event] */
-    pattern: /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\t([0-9a-f-]{36})\t([\s\S]+)\n$/,
-    extract: (match) => {
-      let [level, message] = match[3].split('\t');
-      if (message === undefined) {
-        [level, message] = (['INFO', level]);
-      }
-      return {
-        level,
-        message,
-        requestId: match[2],
-        timestamp: match[1],
-      };
-    },
-  },
-];
-
-const sleep = util.promisify(setTimeout);
-
+/**
+ * Coralogix logger.
+ */
 export class CoralogixLogger {
   constructor(opts) {
     const {
@@ -136,43 +111,23 @@ export class CoralogixLogger {
           throw e;
         }
       }
-      await sleep(this._retryDelays[i] * 1000);
+      await setTimeout(this._retryDelays[i]);
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  extractFields(entry) {
-    const { extractedFields } = entry;
-    if (extractedFields) {
-      let [level, message] = extractedFields.event.split('\t');
-      if (message === undefined) {
-        [level, message] = (['INFO', level]);
-      }
-      return {
-        level,
-        message,
-        requestId: extractedFields.request_id,
-        timestamp: extractedFields.timestamp,
-      };
-    }
-    return MESSAGE_EXTRACTORS.reduce((result, { pattern, extract }) => {
-      if (!result) {
-        const match = entry.message.match(pattern);
-        if (match) {
-          return extract(match);
-        }
-      }
-      return result;
-    }, null);
-  }
-
-  extractMessage(entry) {
-    const { timestamp } = entry;
+  /**
+   * Transform a log event to a log entry that can be sent to Coralogix
+   *
+   * @param {LogEvent} logEvent log event
+   * @returns {CoralogixLogEntry} transformed log entry
+   */
+  createLogEntry(logEvent) {
+    const { timestamp } = logEvent;
     const { log } = this;
 
-    const fields = this.extractFields(entry);
+    const fields = extractFields(logEvent);
     if (!fields) {
-      log.warn(`Unable to extract fields from: ${JSON.stringify(entry, 0, 2)}`);
+      log.warn(`Unable to extract fields from: ${JSON.stringify(logEvent, 0, 2)}`);
       return null;
     }
     const { level, message, requestId } = fields;
@@ -203,17 +158,16 @@ export class CoralogixLogger {
    */
   async sendEntries(logEvents) {
     const rejected = [];
-    const logEntries = logEvents
-      .reduce((result, entry) => {
-        const logEntry = this.extractMessage(entry);
-        if (logEntry) {
-          result.push(logEntry);
-        } else {
-          rejected.push(entry);
-        }
-        return result;
-      }, [])
-      .filter(({ severity }) => severity >= this._severity);
+    const logEntries = [];
+
+    for (const logEvent of logEvents) {
+      const logEntry = this.createLogEntry(logEvent);
+      if (!logEntry) {
+        rejected.push(logEvent);
+      } else if (logEntry.severity >= this._severity) {
+        logEntries.push(logEntry);
+      }
+    }
     if (logEntries.length) {
       const payload = {
         privateKey: this._apiKey,
