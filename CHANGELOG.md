@@ -1,3 +1,73 @@
+## [1.4.11](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.4.10...v1.4.11) (2024-09-22)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#307](https://github.com/adobe/[secure]-coralogix-feeder/issues/307)) ([7cc241c](https://github.com/adobe/[secure]-coralogix-feeder/commit/7cc241c5585574049a478796fcea848d6bda18b9))
+
+## [1.4.10](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.9...v1.4.10) (2024-08-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency aws4 to v1.13.2 ([#300](https://github.com/adobe/helix-coralogix-feeder/issues/300)) ([b11e51f](https://github.com/adobe/helix-coralogix-feeder/commit/b11e51f5aa6a45f5d79d14ca3a2f141287acf5a4))
+
+## [1.4.9](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.8...v1.4.9) (2024-08-10)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([#293](https://github.com/adobe/helix-coralogix-feeder/issues/293)) ([5895bb8](https://github.com/adobe/helix-coralogix-feeder/commit/5895bb800fcc2a04dcb47096ed9c4825aae20244))
+
+## [1.4.8](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.7...v1.4.8) (2024-06-07)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#268](https://github.com/adobe/helix-coralogix-feeder/issues/268)) ([6229148](https://github.com/adobe/helix-coralogix-feeder/commit/6229148f6ca04b4a898e8fed03960b18120a468e))
+
+## [1.4.7](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.6...v1.4.7) (2024-06-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-status to v10.1.0 ([#266](https://github.com/adobe/helix-coralogix-feeder/issues/266)) ([6ca0e15](https://github.com/adobe/helix-coralogix-feeder/commit/6ca0e15755001a7eb6093530abedfbc2bd52d397))
+
+## [1.4.6](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.5...v1.4.6) (2024-06-02)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#264](https://github.com/adobe/helix-coralogix-feeder/issues/264)) ([262be4d](https://github.com/adobe/helix-coralogix-feeder/commit/262be4d7c319debfa8dde223b9ed349c6fc30de9))
+
+## [1.4.5](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.4...v1.4.5) (2024-05-25)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([#261](https://github.com/adobe/helix-coralogix-feeder/issues/261)) ([bd9d7f1](https://github.com/adobe/helix-coralogix-feeder/commit/bd9d7f1b69775f140609bb6ed19fac3d3af8aefe))
+
+## [1.4.4](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.3...v1.4.4) (2024-04-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/helix-shared-wrap to v2.0.2 ([#252](https://github.com/adobe/helix-coralogix-feeder/issues/252)) ([5f1443d](https://github.com/adobe/helix-coralogix-feeder/commit/5f1443da36742434613349896ad836437d34f88d))
+
+## [1.4.3](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.2...v1.4.3) (2024-04-12)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#248](https://github.com/adobe/helix-coralogix-feeder/issues/248)) ([7175162](https://github.com/adobe/helix-coralogix-feeder/commit/71751622d63ef268b718c1839c84d46e2523460f))
+
+## [1.4.2](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.1...v1.4.2) (2024-04-11)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#247](https://github.com/adobe/helix-coralogix-feeder/issues/247)) ([db011d2](https://github.com/adobe/helix-coralogix-feeder/commit/db011d280b694a7fc788d9bba1fee97a75b6cac9))
+
 ## [1.4.1](https://github.com/adobe/helix-coralogix-feeder/compare/v1.4.0...v1.4.1) (2023-12-19)
 
 
