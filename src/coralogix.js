@@ -12,9 +12,9 @@
 
 /* eslint-disable no-await-in-loop */
 
-import { setTimeout } from 'node:timers/promises';
 import { hostname } from 'os';
 import path from 'path';
+import wrapFetch from 'fetch-retry';
 import { FetchError, Request } from '@adobe/fetch';
 import { fetchContext } from './support/utils.js';
 import { extractFields } from './extract-fields.js';
@@ -50,6 +50,30 @@ const DEFAULT_RETRY_DELAYS = [
   5000, 10000,
 ];
 
+const { fetch: originalFetch } = fetchContext;
+
+const MOCHA_ENV = (process.env.HELIX_FETCH_FORCE_HTTP1 === 'true');
+
+/**
+ * Wrapped fetch that retries on certain conditions.
+ */
+const fetch = wrapFetch(originalFetch, {
+  retryDelay: MOCHA_ENV ? 1 /* c8 ignore next */ : 1000,
+  retryOn: async (attempt, error, response) => {
+    const retries = MOCHA_ENV ? 1 /* c8 ignore next */ : 2;
+    if (error) {
+      if (error instanceof FetchError) {
+        return attempt < retries;
+      }
+      throw error;
+    }
+    if (!response.ok) {
+      throw new Error(`Failed to send logs with status ${response.status}: ${await response.text()}`);
+    }
+    return false;
+  },
+});
+
 /**
  * Coralogix logger.
  */
@@ -82,7 +106,6 @@ export class CoralogixLogger {
 
   async sendPayload(payload) {
     try {
-      const { fetch } = fetchContext;
       const resp = await fetch(new Request(path.join(this._apiUrl, '/logs'), {
         method: 'POST',
         headers: {
@@ -94,24 +117,6 @@ export class CoralogixLogger {
       /* c8 ignore next 3 */
     } finally {
       await fetchContext.reset();
-    }
-  }
-
-  async sendPayloadWithRetries(payload) {
-    for (let i = 0; i <= this._retryDelays.length; i += 1) {
-      let resp;
-      try {
-        resp = await this.sendPayload(payload);
-        if (!resp.ok) {
-          throw new Error(`Failed to send logs with status ${resp.status}: ${await resp.text()}`);
-        }
-        break;
-      } catch (e) {
-        if (!(e instanceof FetchError) || i === this._retryDelays.length) {
-          throw e;
-        }
-      }
-      await setTimeout(this._retryDelays[i]);
     }
   }
 
@@ -177,7 +182,7 @@ export class CoralogixLogger {
         computerName: this._host,
         logEntries,
       };
-      await this.sendPayloadWithRetries(payload);
+      await this.sendPayload(payload);
     }
     return rejected;
   }

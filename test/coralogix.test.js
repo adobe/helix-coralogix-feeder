@@ -286,4 +286,24 @@ describe('Coralogix Tests', () => {
       /Failed to send logs with status 400: input malformed/,
     );
   });
+
+  it('throws when posting returns an error other than FetchError', async () => {
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .replyWithError(new TypeError('something went wrong'));
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
+    });
+    await assert.rejects(
+      async () => logger.sendEntries([{
+        timestamp: Date.now(),
+        extractedFields: {
+          event: 'INFO\tmessage\n',
+        },
+      }]),
+      /TypeError: something went wrong/,
+    );
+  });
 });
