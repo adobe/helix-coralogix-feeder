@@ -233,7 +233,6 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
-      retryDelays: [1],
     });
     await assert.doesNotReject(
       async () => logger.sendEntries([{
@@ -254,7 +253,6 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
-      retryDelays: [1],
     });
     await assert.rejects(
       async () => logger.sendEntries([{
