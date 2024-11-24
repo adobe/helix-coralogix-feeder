@@ -45,11 +45,6 @@ const LOG_LEVEL_MAPPING = {
   SILLY: 1,
 };
 
-const DEFAULT_RETRY_DELAYS = [
-  // wait 5 seconds, try again, wait another 10 seconds, and try again
-  5000, 10000,
-];
-
 const { fetch: originalFetch } = fetchContext;
 
 const MOCHA_ENV = (process.env.HELIX_FETCH_FORCE_HTTP1 === 'true');
@@ -58,7 +53,13 @@ const MOCHA_ENV = (process.env.HELIX_FETCH_FORCE_HTTP1 === 'true');
  * Wrapped fetch that retries on certain conditions.
  */
 const fetch = wrapFetch(originalFetch, {
-  retryDelay: MOCHA_ENV ? 1 /* c8 ignore next */ : 1000,
+  retryDelay: (attempt) => {
+    if (MOCHA_ENV) {
+      return 1;
+    }
+    /* c8 ignore next */
+    return (2 ** attempt * 1000); // 1000, 2000, 4000
+  },
   retryOn: async (attempt, error, response) => {
     const retries = MOCHA_ENV ? 1 /* c8 ignore next */ : 2;
     if (error) {
@@ -86,7 +87,6 @@ export class CoralogixLogger {
       log = console,
       apiUrl = 'https://api.coralogix.com/api/v1/',
       level = 'info',
-      retryDelays = DEFAULT_RETRY_DELAYS,
       logStream,
       subsystem,
     } = opts;
@@ -97,7 +97,6 @@ export class CoralogixLogger {
     this._apiUrl = apiUrl;
     this._host = hostname();
     this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
-    this._retryDelays = retryDelays;
     this._logStream = logStream;
 
     this._funcName = funcName;
