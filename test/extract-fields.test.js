@@ -53,7 +53,7 @@ describe('Extract Fields Tests', () => {
     });
     assert.deepStrictEqual(fields, {
       level: 'DEBUG',
-      message: 'REPORT\tDuration: 26.25 ms\tBilled Duration: 27 ms\tMemory Size: 128 MB\tMax Memory Used: 70 MB\tInit Duration: 145.09 ms\t',
+      message: 'REPORT Duration: 26.25 ms\tBilled Duration: 27 ms\tMemory Size: 128 MB\tMax Memory Used: 70 MB\tInit Duration: 145.09 ms\t',
       requestId: '2c17c779-5002-4479-8cf4-7b037c1463a4',
     });
   });
@@ -75,7 +75,7 @@ describe('Extract Fields Tests', () => {
     });
     assert.deepStrictEqual(fields, {
       level: 'ERROR',
-      message: 'REPORT\tDuration: 3000.00 ms\tBilled Duration: 3000 ms\tMemory Size: 128 MB\tMax Memory Used: 70 MB\tInit Duration: 164.66 ms\tStatus: timeout',
+      message: 'REPORT Duration: 3000.00 ms\tBilled Duration: 3000 ms\tMemory Size: 128 MB\tMax Memory Used: 70 MB\tInit Duration: 164.66 ms\tStatus: timeout',
       requestId: '3dca290b-7b88-47c9-8dbd-84f107ecf9e1',
     });
   });
@@ -86,7 +86,7 @@ describe('Extract Fields Tests', () => {
     });
     assert.deepStrictEqual(fields, {
       level: 'ERROR',
-      message: 'REPORT\tDuration: 3000.00 ms\tBilled Duration: 3000 ms\tMemory Size: 128 MB\tMax Memory Used: 70 MB\tStatus: error\tError Type: Runtime.OutOfMemory',
+      message: 'REPORT Duration: 3000.00 ms\tBilled Duration: 3000 ms\tMemory Size: 128 MB\tMax Memory Used: 70 MB\tStatus: error\tError Type: Runtime.OutOfMemory',
       requestId: '3dca290b-7b88-47c9-8dbd-84f107ecf9e1',
     });
   });

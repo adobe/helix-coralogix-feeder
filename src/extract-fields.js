@@ -32,19 +32,30 @@ const MESSAGE_EXTRACTORS = [
     }),
   },
   {
-    /* REPORT may contain a `Status` field indicating an error occurred */
-    pattern: /^(?<phase>START|END|REPORT) RequestId: (?<requestId>[0-9a-f-]{36})(?<text>[\s\S]+)?\n$/,
+    pattern: /^(?<phase>START|END) RequestId: (?<requestId>[0-9a-f-]{36})(?<text>[\s\S]+)?\n$/,
     extract: ({ groups: { phase, requestId, text } }) => {
       const segments = text?.split('\t') || [];
-      let level = 'DEBUG';
-      if (phase === 'REPORT') {
-        const status = segments.find((segment) => segment.startsWith('Status: '));
-        if (status) {
-          level = 'ERROR';
-        }
-      }
       return {
         message: `${phase}${segments.join('\t')}`,
+        requestId,
+        level: 'DEBUG',
+      };
+    },
+  },
+  {
+    /* REPORT may contain a `Status` field indicating an error occurred */
+    pattern: /^(?<phase>REPORT) RequestId: (?<requestId>[0-9a-f-]{36})(?<text>[\s\S]+)\n$/,
+    extract: ({ groups: { phase, requestId, text } }) => {
+      const segments = text.split('\t');
+      segments.shift();
+
+      let level = 'DEBUG';
+      const status = segments.find((segment) => segment.startsWith('Status: '));
+      if (status) {
+        level = 'ERROR';
+      }
+      return {
+        message: `${phase} ${segments.join('\t')}`,
         requestId,
         level,
       };
