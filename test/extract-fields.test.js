@@ -96,7 +96,7 @@ describe('Extract Fields Tests', () => {
       message: '2024-11-20T18:19:35.211Z\tfb732cef-3a5d-533a-ba09-73571cbf8624\tTask timed out after 900.09 seconds\n',
     });
     assert.deepStrictEqual(fields, {
-      level: 'ERROR',
+      level: 'INFO',
       message: 'Task timed out after 900.09 seconds',
       requestId: 'fb732cef-3a5d-533a-ba09-73571cbf8624',
       timestamp: '2024-11-20T18:19:35.211Z',

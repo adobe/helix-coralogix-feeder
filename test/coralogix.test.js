@@ -31,7 +31,7 @@ describe('Coralogix Tests', () => {
       .reply((_, body) => {
         assert.deepStrictEqual(body.logEntries, [{
           severity: 3,
-          text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"this should end up as INFO message","level":"bleep"}',
+          text: '{"inv":{"invocationId":"d12ddc0c-1f6b-51d7-be22-83b52c83d6da","functionName":"/services/func/v1"},"message":"this should end up as INFO message","level":"bleep","timestamp":"2024-11-21T13:12:30.462Z"}',
           timestamp: 1668084827204,
         }]);
         return [200];
@@ -48,6 +48,8 @@ describe('Coralogix Tests', () => {
         {
           timestamp: date.getTime(),
           extractedFields: {
+            timestamp: '2024-11-21T13:12:30.462Z',
+            request_id: 'd12ddc0c-1f6b-51d7-be22-83b52c83d6da',
             event: 'BLEEP\tthis should end up as INFO message\n',
           },
         },

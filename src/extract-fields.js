@@ -32,6 +32,7 @@ const MESSAGE_EXTRACTORS = [
     }),
   },
   {
+    /* REPORT may contain a `Status` field indicating an error occurred */
     pattern: /^(?<phase>START|END|REPORT) RequestId: (?<requestId>[0-9a-f-]{36})(?<text>[\s\S]+)?\n$/,
     extract: ({ groups: { phase, requestId, text } }) => {
       const segments = text?.split('\t') || [];
@@ -50,7 +51,7 @@ const MESSAGE_EXTRACTORS = [
     },
   },
   {
-    /* AWS uses this format to report unexpected errors */
+    /* AWS uses this format to report `killed` services */
     pattern: /^RequestId: (?<requestId>[0-9a-f-]{36}) Error: (?<text>[\s\S]+)\n$/,
     extract: ({ groups: { requestId, text } }) => ({
       message: text,
@@ -59,22 +60,13 @@ const MESSAGE_EXTRACTORS = [
     }),
   },
   {
-    /* standard extractor corresponding to pattern [timestamp=*Z, request_id="*-*", event] */
+    /* standard whitespace pattern [timestamp=*Z, request_id="*-*", event] */
     pattern: /^(?<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\t(?<requestId>[0-9a-f-]{36})\t(?<text>[\s\S]+)\n$/,
     extract: ({ groups: { timestamp, requestId, text } }) => {
-      const segments = text.split('\t');
-      const message = segments.pop();
-      if (segments.length === 0) {
-        if (message.startsWith('Task timed out')) {
-          return {
-            level: 'ERROR', message, requestId, timestamp,
-          };
-        }
-        return {
-          level: 'INFO', message, requestId, timestamp,
-        };
+      let [level, message] = text.split('\t');
+      if (message === undefined) {
+        [level, message] = (['INFO', level]);
       }
-      const level = segments.pop();
       return {
         level, message, requestId, timestamp,
       };

@@ -116,10 +116,11 @@ export class CoralogixLogger {
   }
 
   /**
-   * Transform a log event to a log entry that can be sent to Coralogix
+   * Create a log entry for Coralogix from a log event. Returns `null` if we cannot
+   * make up individual fields in the log event.
    *
    * @param {LogEvent} logEvent log event
-   * @returns {CoralogixLogEntry} transformed log entry
+   * @returns {CoralogixLogEntry|null} transformed log entry
    */
   createLogEntry(logEvent) {
     const { timestamp } = logEvent;
