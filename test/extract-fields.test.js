@@ -58,6 +58,20 @@ describe('Extract Fields Tests', () => {
     });
   });
 
+  it('handles standard log message', async () => {
+    const fields = extractFields({
+      id: '38635137308541392840375210768127625533795665023722651661',
+      timestamp: 1732459474542,
+      message: '2024-11-24T14:44:34.542Z\t8c8b67c9-9ca3-4659-be83-30071e3045be\tINFO\tCreating S3Client without credentials\n',
+    });
+    assert.deepStrictEqual(fields, {
+      level: 'INFO',
+      message: 'Creating S3Client without credentials',
+      requestId: '8c8b67c9-9ca3-4659-be83-30071e3045be',
+      timestamp: '2024-11-24T14:44:34.542Z',
+    });
+  });
+
   it('detects an generic service kill', async () => {
     const fields = extractFields({
       message: 'RequestId: 66ce6204-7c13-50f6-a32c-3db39caefc6b Error: Runtime exited with error: signal: killed Runtime.ExitError\n',

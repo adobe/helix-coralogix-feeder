@@ -72,7 +72,7 @@ const MESSAGE_EXTRACTORS = [
   },
   {
     /* standard whitespace pattern [timestamp=*Z, request_id="*-*", event] */
-    pattern: /^(?<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\t(?<requestId>[0-9a-f-]{36})\t(?<text>[\s\S]+)\n$/,
+    pattern: /^(?<timestamp>\S+Z)\t(?<requestId>[0-9a-f-]+)\t(?<text>[\s\S]+)\n$/,
     extract: ({ groups: { timestamp, requestId, text } }) => {
       let [level, message] = text.split('\t');
       if (message === undefined) {
