@@ -63,7 +63,7 @@ const MESSAGE_EXTRACTORS = [
   },
   {
     /* AWS uses this format to report `killed` services */
-    pattern: /^RequestId: (?<requestId>[0-9a-f-]{36}) Error: (?<text>[\s\S]+)\n$/,
+    pattern: /^RequestId: (?<requestId>[0-9a-f-]{36})\s+Error: (?<text>[\s\S]+)\n$/,
     extract: ({ groups: { requestId, text } }) => ({
       message: text,
       requestId,
@@ -72,7 +72,7 @@ const MESSAGE_EXTRACTORS = [
   },
   {
     /* standard whitespace pattern [timestamp=*Z, request_id="*-*", event] */
-    pattern: /^(?<timestamp>\S+Z)\t(?<requestId>[0-9a-f-]+)\t(?<text>[\s\S]+)\n$/,
+    pattern: /^(?<timestamp>\S+Z)\t(?<requestId>[0-9a-f-]{36})\t(?<text>[\s\S]+)\n$/,
     extract: ({ groups: { timestamp, requestId, text } }) => {
       let [level, message] = text.split('\t');
       if (message === undefined) {
