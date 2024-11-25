@@ -31,12 +31,15 @@ describe('Coralogix Tests', () => {
       .reply((_, body) => {
         assert.deepStrictEqual(body.logEntries, [{
           severity: 3,
-          text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"this should end up as INFO message","level":"bleep"}',
+          text: '{"inv":{"invocationId":"d12ddc0c-1f6b-51d7-be22-83b52c83d6da","functionName":"/services/func/v1"},"message":"this should end up as INFO message","level":"bleep","timestamp":"2024-11-21T13:12:30.462Z"}',
           timestamp: 1668084827204,
         }]);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       apiUrl: 'https://www.example.com/',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -45,6 +48,8 @@ describe('Coralogix Tests', () => {
         {
           timestamp: date.getTime(),
           extractedFields: {
+            timestamp: '2024-11-21T13:12:30.462Z',
+            request_id: 'd12ddc0c-1f6b-51d7-be22-83b52c83d6da',
             event: 'BLEEP\tthis should end up as INFO message\n',
           },
         },
@@ -69,7 +74,10 @@ describe('Coralogix Tests', () => {
         }]);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       level: 'chatty',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -102,7 +110,10 @@ describe('Coralogix Tests', () => {
         }]);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       level: 'warn',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -141,7 +152,10 @@ describe('Coralogix Tests', () => {
         }]);
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       level: 'info',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -157,8 +171,11 @@ describe('Coralogix Tests', () => {
     );
   });
 
-  it('invokes constructor with higher log level, should filter all messages, and nothing sent', async () => {
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+  it('invokes constructor, should filter DEBUG messages, and nothing sent', async () => {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       level: 'info',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -181,7 +198,10 @@ describe('Coralogix Tests', () => {
         assert.strictEqual(body.subsystemName, 'my-services');
         return [200];
       });
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', {
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
       subsystem: 'my-services',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -209,7 +229,11 @@ describe('Coralogix Tests', () => {
       .replyWithError('that went wrong')
       .post('/api/v1/logs')
       .reply(200);
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', { retryDelays: [1] });
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
+    });
     await assert.doesNotReject(
       async () => logger.sendEntries([{
         timestamp: Date.now(),
@@ -225,7 +249,11 @@ describe('Coralogix Tests', () => {
       .post('/api/v1/logs')
       .twice()
       .replyWithError('that went wrong');
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app', { retryDelays: [1] });
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
+    });
     await assert.rejects(
       async () => logger.sendEntries([{
         timestamp: Date.now(),
@@ -241,7 +269,11 @@ describe('Coralogix Tests', () => {
     nock('https://api.coralogix.com')
       .post('/api/v1/logs')
       .reply(400, 'input malformed');
-    const logger = new CoralogixLogger('foo-id', '/services/func/v1', 'app');
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
+    });
     await assert.rejects(
       async () => logger.sendEntries([{
         timestamp: Date.now(),
@@ -250,6 +282,26 @@ describe('Coralogix Tests', () => {
         },
       }]),
       /Failed to send logs with status 400: input malformed/,
+    );
+  });
+
+  it('throws when posting returns an error other than FetchError', async () => {
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .replyWithError(new TypeError('something went wrong'));
+    const logger = new CoralogixLogger({
+      apiKey: 'foo-id',
+      funcName: '/services/func/v1',
+      appName: 'app',
+    });
+    await assert.rejects(
+      async () => logger.sendEntries([{
+        timestamp: Date.now(),
+        extractedFields: {
+          event: 'INFO\tmessage\n',
+        },
+      }]),
+      /TypeError: something went wrong/,
     );
   });
 });

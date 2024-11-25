@@ -14,9 +14,26 @@
 
 import { hostname } from 'os';
 import path from 'path';
-import util from 'util';
+import wrapFetch from 'fetch-retry';
 import { FetchError, Request } from '@adobe/fetch';
 import { fetchContext } from './support/utils.js';
+import { extractFields } from './extract-fields.js';
+
+/**
+ * @typedef LogEvent
+ * @property {string} id event id
+ * @property {number} timestamp timestamp
+ * @property {string} message message, which might have a variety of formats
+ * @property {string} extractedFields extracted fields,
+ * only present when a non-empty filter pattern has been specified
+ */
+
+/**
+ * @typedef CoralogixLogEntry
+ * @property {number} timestamp timestamp
+ * @property {string} text JSON stringified object, containing various fields
+ * @property {number} severity log level (see LOG_LEVEL_MAPPING)
+ */
 
 const LOG_LEVEL_MAPPING = {
   ERROR: 5,
@@ -28,29 +45,58 @@ const LOG_LEVEL_MAPPING = {
   SILLY: 1,
 };
 
-const DEFAULT_RETRY_DELAYS = [
-  // wait 5 seconds, try again, wait another 10 seconds, and try again
-  5, 10,
-];
+const { fetch: originalFetch } = fetchContext;
 
-const sleep = util.promisify(setTimeout);
+const MOCHA_ENV = (process.env.HELIX_FETCH_FORCE_HTTP1 === 'true');
 
+/**
+ * Wrapped fetch that retries on certain conditions.
+ */
+const fetch = wrapFetch(originalFetch, {
+  retryDelay: (attempt) => {
+    if (MOCHA_ENV) {
+      return 1;
+    }
+    /* c8 ignore next */
+    return (2 ** attempt * 1000); // 1000, 2000, 4000
+  },
+  retryOn: async (attempt, error, response) => {
+    const retries = MOCHA_ENV ? 1 /* c8 ignore next */ : 2;
+    if (error) {
+      if (error instanceof FetchError) {
+        return attempt < retries;
+      }
+      throw error;
+    }
+    if (!response.ok) {
+      throw new Error(`Failed to send logs with status ${response.status}: ${await response.text()}`);
+    }
+    return false;
+  },
+});
+
+/**
+ * Coralogix logger.
+ */
 export class CoralogixLogger {
-  constructor(apiKey, funcName, appName, opts = {}) {
+  constructor(opts) {
     const {
+      apiKey,
+      funcName,
+      appName,
+      log = console,
       apiUrl = 'https://api.coralogix.com/api/v1/',
       level = 'info',
-      retryDelays = DEFAULT_RETRY_DELAYS,
       logStream,
       subsystem,
     } = opts;
 
     this._apiKey = apiKey;
     this._appName = appName;
+    this._log = log;
     this._apiUrl = apiUrl;
     this._host = hostname();
     this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
-    this._retryDelays = retryDelays;
     this._logStream = logStream;
 
     this._funcName = funcName;
@@ -59,7 +105,6 @@ export class CoralogixLogger {
 
   async sendPayload(payload) {
     try {
-      const { fetch } = fetchContext;
       const resp = await fetch(new Request(path.join(this._apiUrl, '/logs'), {
         method: 'POST',
         headers: {
@@ -74,61 +119,74 @@ export class CoralogixLogger {
     }
   }
 
-  async sendPayloadWithRetries(payload) {
-    for (let i = 0; i <= this._retryDelays.length; i += 1) {
-      let resp;
-      try {
-        resp = await this.sendPayload(payload);
-        if (!resp.ok) {
-          throw new Error(`Failed to send logs with status ${resp.status}: ${await resp.text()}`);
-        }
-        break;
-      } catch (e) {
-        if (!(e instanceof FetchError) || i === this._retryDelays.length) {
-          throw e;
-        }
-      }
-      await sleep(this._retryDelays[i] * 1000);
+  /**
+   * Create a log entry for Coralogix from a log event. Returns `null` if we cannot
+   * make up individual fields in the log event.
+   *
+   * @param {LogEvent} logEvent log event
+   * @returns {CoralogixLogEntry|null} transformed log entry
+   */
+  createLogEntry(logEvent) {
+    const { timestamp } = logEvent;
+    const { log } = this;
+
+    const fields = extractFields(logEvent);
+    if (!fields) {
+      log.warn(`Unable to extract fields from: ${JSON.stringify(logEvent, 0, 2)}`);
+      return null;
     }
+    const { level, message, requestId } = fields;
+    const text = {
+      inv: {
+        invocationId: requestId || 'n/a',
+        functionName: this._funcName,
+      },
+      message: message.trimEnd(),
+      level: level.toLowerCase(),
+      timestamp: fields.timestamp,
+    };
+    if (this._logStream) {
+      text.logStream = this._logStream;
+    }
+    return {
+      timestamp,
+      text: JSON.stringify(text),
+      severity: LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO,
+    };
   }
 
-  async sendEntries(entries) {
-    const logEntries = entries
-      .map(({ timestamp, extractedFields }) => {
-        let [level, message] = extractedFields.event.split('\t');
-        if (message === undefined) {
-          [level, message] = (['INFO', level]);
-        }
-        const text = {
-          inv: {
-            invocationId: extractedFields.request_id || 'n/a',
-            functionName: this._funcName,
-          },
-          message: message.trimEnd(),
-          level: level.toLowerCase(),
-          timestamp: extractedFields.timestamp,
-        };
-        if (this._logStream) {
-          text.logStream = this._logStream;
-        }
-        return {
-          timestamp,
-          text: JSON.stringify(text),
-          severity: LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO,
-        };
-      })
-      .filter(({ severity }) => severity >= this._severity);
-    if (logEntries.length === 0) {
-      return;
-    }
+  /**
+   * Send entries to Coralogix
+   *
+   * @param {LogEvent[]} logEvents log events
+   * @returns {Promise<LogEvent[]} rejected log entries
+   */
+  async sendEntries(logEvents) {
+    const rejected = [];
+    const logEntries = [];
 
-    const payload = {
-      privateKey: this._apiKey,
-      applicationName: this._appName,
-      subsystemName: this._subsystem,
-      computerName: this._host,
-      logEntries,
-    };
-    await this.sendPayloadWithRetries(payload);
+    for (const logEvent of logEvents) {
+      const logEntry = this.createLogEntry(logEvent);
+      if (!logEntry) {
+        rejected.push(logEvent);
+      } else if (logEntry.severity >= this._severity) {
+        logEntries.push(logEntry);
+      }
+    }
+    if (logEntries.length) {
+      const payload = {
+        privateKey: this._apiKey,
+        applicationName: this._appName,
+        subsystemName: this._subsystem,
+        computerName: this._host,
+        logEntries,
+      };
+      await this.sendPayload(payload);
+    }
+    return rejected;
+  }
+
+  get log() {
+    return this._log;
   }
 }

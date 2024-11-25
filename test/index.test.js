@@ -12,6 +12,8 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
+import { resolve } from 'path';
+import fs from 'fs/promises';
 import util from 'util';
 import zlib from 'zlib';
 import { Request } from '@adobe/fetch';
@@ -364,6 +366,49 @@ describe('Index Tests', () => {
     await assert.rejects(
       async () => main(new Request('https://localhost/'), createContext(payload)),
       /that went wrong/,
+    );
+  });
+
+  it('allows definining subscription filter without pattern', async () => {
+    const contents = await fs.readFile(resolve(__rootdir, 'test', 'fixtures', 'patternless.json'));
+    const { input, output } = JSON.parse(contents);
+
+    const payload = (await gzip(JSON.stringify(input))).toString('base64');
+    nock('https://api.coralogix.com/api/v1/')
+      .post('/logs')
+      .reply((_, body) => {
+        // eslint-disable-next-line no-param-reassign
+        delete body.computerName;
+        assert.deepStrictEqual(body, output);
+        return [200];
+      });
+    nock('https://sqs.us-east-1.amazonaws.com')
+      .post('/')
+      .reply((_, body) => {
+        const rejected = JSON.parse(new URLSearchParams(body).get('MessageBody'));
+        assert.strictEqual(rejected.length, 1);
+        assert.deepStrictEqual(rejected[0].message, 'This message has no known pattern and will be discarded\n');
+        return [200, `<?xml version="1.0"?>
+<SendMessageResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+  <SendMessageResult>
+    <MessageId>id</MessageId>
+  </SendMessageResult>
+  <ResponseMetadata>
+    <RequestId>id</RequestId>
+  </ResponseMetadata>
+</SendMessageResponse>
+`];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, {
+          ...DEFAULT_ENV,
+          CORALOGIX_SUBSYSTEM: 'my-services',
+          CORALOGIX_LOG_LEVEL: 'debug',
+        }),
+      ),
     );
   });
 });
