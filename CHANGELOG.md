@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.4.11...v1.5.0) (2024-11-25)
+
+
+### Features
+
+* support filter without patterns ([#195](https://github.com/adobe/[secure]-coralogix-feeder/issues/195)) ([653f715](https://github.com/adobe/[secure]-coralogix-feeder/commit/653f715d7f45c02aa80fe2452ae687c86e6bef97))
+
 ## [1.4.11](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.4.10...v1.4.11) (2024-09-22)
 
 
