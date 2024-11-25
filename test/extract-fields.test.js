@@ -116,4 +116,11 @@ describe('Extract Fields Tests', () => {
       timestamp: '2024-11-20T18:19:35.211Z',
     });
   });
+
+  it('returns \'null\' for messages with no known pattern', async () => {
+    const fields = extractFields({
+      message: 'This message has no known pattern and will be discarded\n',
+    });
+    assert.strictEqual(fields, null);
+  });
 });
