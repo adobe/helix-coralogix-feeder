@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.5.1...v1.5.2) (2024-12-08)
+
+
+### Bug Fixes
+
+* **deps:** update adobe fixes ([#332](https://github.com/adobe/[secure]-coralogix-feeder/issues/332)) ([2645ef4](https://github.com/adobe/[secure]-coralogix-feeder/commit/2645ef4c20633af177acb8254285f51e6d1384e2))
+
 ## [1.5.1](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.5.0...v1.5.1) (2024-12-06)
 
 
