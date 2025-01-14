@@ -183,7 +183,7 @@ export class CoralogixLogger {
       };
       await this.sendPayload(payload);
     }
-    return rejected;
+    return { rejected, sent: logEntries.length };
   }
 
   get log() {

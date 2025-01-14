@@ -57,7 +57,6 @@ async function run(request, context) {
     const payload = Buffer.from(event.awslogs.data, 'base64');
     const uncompressed = await gunzip(payload);
     input = JSON.parse(uncompressed.toString());
-    log.info(`Received ${input.logEvents.length} event(s) for [${input.logGroup}][${input.logStream}]`);
 
     const [,,, funcName] = input.logGroup.split('/');
     const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/[a-z-]*\[(\d+|\$LATEST)\]\w+/);
@@ -80,7 +79,8 @@ async function run(request, context) {
       logStream: input.logStream,
       subsystem,
     });
-    const rejected = await logger.sendEntries(input.logEvents);
+    const { rejected, sent } = await logger.sendEntries(input.logEvents);
+    log.info(`Received ${input.logEvents.length} event(s) for [${input.logGroup}][${input.logStream}], sent: ${sent}`);
     if (rejected.length) {
       await sendToDLQ(context, rejected);
     }
