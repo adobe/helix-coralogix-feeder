@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.5.5...v1.6.0) (2025-05-20)
+
+
+### Features
+
+* **deps:** update dependency @adobe/[secure]-deploy to v13 ([#387](https://github.com/adobe/[secure]-coralogix-feeder/issues/387)) ([57fc785](https://github.com/adobe/[secure]-coralogix-feeder/commit/57fc785e99ec70c75f1624d68c26d148c258c4e6))
+
 ## [1.5.5](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.5.4...v1.5.5) (2025-05-20)
 
 
