@@ -1,3 +1,10 @@
+## [1.5.5](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.5.4...v1.5.5) (2025-05-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/fetch to v4.2.2 ([#389](https://github.com/adobe/[secure]-coralogix-feeder/issues/389)) ([06f7620](https://github.com/adobe/[secure]-coralogix-feeder/commit/06f76204398141d3c23c2c49267ab9f4372e692d))
+
 ## [1.5.4](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.5.3...v1.5.4) (2025-05-11)
 
 
