@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.6.0...v1.7.0) (2025-06-27)
+
+
+### Features
+
+* allow filtering events sent to the feeder by log level ([#408](https://github.com/adobe/[secure]-coralogix-feeder/issues/408)) ([b023623](https://github.com/adobe/[secure]-coralogix-feeder/commit/b02362347329c76c3801ee30dec7b9379c9d6180))
+
 # [1.6.0](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.5.5...v1.6.0) (2025-05-20)
 
 
