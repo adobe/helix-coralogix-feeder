@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.7.0...v1.7.1) (2025-06-27)
+
+
+### Bug Fixes
+
+* **release:** add missing permission ([b37d677](https://github.com/adobe/[secure]-coralogix-feeder/commit/b37d6772cab29a61ec87f43ccd38db86b98c7424))
+
 # [1.7.0](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.6.0...v1.7.0) (2025-06-27)
 
 
