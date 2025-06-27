@@ -24,6 +24,12 @@ $ aws logs put-subscription-filter \
   --destination-arn 'arn:aws:lambda:<region>:<accountid>:function:helix-services--coralogix-feeder:v1'
 ```
 
+You can filter log events sent by level as follows:
+```
+  --filter-pattern '[timestamp=*Z, request_id="*-*", level=%WARN|ERROR%, event]'
+```
+this will invoke the feeder only for WARN and ERROR messages.
+
 If you get an error that CloudWatch is not allowed to execute your function, add the following permission:
 ```
 aws lambda add-permission \
