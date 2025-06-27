@@ -95,15 +95,26 @@ const MESSAGE_EXTRACTORS = [
 export function extractFields(logEvent) {
   const { extractedFields } = logEvent;
   if (extractedFields) {
-    let [level, message] = extractedFields.event.split('\t');
-    if (message === undefined) {
-      [level, message] = (['INFO', level]);
+    const { event, request_id: requestId, timestamp } = extractedFields;
+
+    let { level } = extractedFields;
+    let message;
+
+    if (level === undefined) {
+      // filter is: [timestamp=*Z, request_id="*-*", event]
+      [level, message] = event.split('\t');
+      if (message === undefined) {
+        [level, message] = (['INFO', level]);
+      }
+    } else {
+      // filter is: [timestamp=*Z, request_id="*-*", level=%WARN|ERROR%, event]
+      message = event;
     }
     return {
       level,
       message,
-      requestId: extractedFields.request_id,
-      timestamp: extractedFields.timestamp,
+      requestId,
+      timestamp,
     };
   }
   for (const { pattern, extract } of MESSAGE_EXTRACTORS) {

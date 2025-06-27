@@ -59,6 +59,15 @@ describe('Coralogix Tests', () => {
             event: 'DEBUG\tthis should not be visible\n',
           },
         },
+        {
+          timestamp: date.getTime(),
+          extractedFields: {
+            timestamp: '2024-11-21T13:12:30.462Z',
+            request_id: 'd12ddc0c-1f6b-51d7-be22-83b52c83d6da',
+            event: 'neither should this be visible\n',
+            level: 'DEBUG',
+          },
+        },
       ]),
     );
   });
