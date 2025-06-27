@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.7.1...v1.7.2) (2025-06-27)
+
+
+### Bug Fixes
+
+* icon URL should come from aem.page ([35ca64b](https://github.com/adobe/[secure]-coralogix-feeder/commit/35ca64b494ac19202a8e8a094a9a05cfade96413))
+
 ## [1.7.1](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.7.0...v1.7.1) (2025-06-27)
 
 
