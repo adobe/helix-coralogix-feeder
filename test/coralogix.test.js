@@ -26,8 +26,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('invokes constructor with different backend URL', async () => {
-    nock('https://www.example.com')
-      .post('/logs/v1/singles')
+    nock.coralogix({ url: 'https://www.example.com' })
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'app',
@@ -77,8 +76,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('invokes constructor with unknown log level, should be treated as info', async () => {
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'app',
@@ -115,8 +113,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('invokes constructor with higher log level, should filter other messages', async () => {
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'app',
@@ -159,8 +156,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('sends entry with no log level, should default to INFO', async () => {
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'app',
@@ -211,8 +207,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('invokes constructor with customized subsystem', async () => {
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply((_, body) => {
         assert.strictEqual(body[0].subsystemName, 'my-services');
         return [200];
@@ -243,8 +238,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('retries as many times as we have delays and stops when successful', async () => {
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .replyWithError('that went wrong')
       .post('/logs/v1/singles')
       .reply(200);
@@ -264,8 +258,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('forwards error when posting throws when all delays are consumed', async () => {
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .twice()
       .replyWithError('that went wrong');
     const logger = new CoralogixLogger({
@@ -285,8 +278,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('throws when posting returns a bad status code', async () => {
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply(400, 'input malformed');
     const logger = new CoralogixLogger({
       apiKey: 'foo-id',
@@ -305,8 +297,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('throws when posting returns an error other than FetchError', async () => {
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .replyWithError(new TypeError('something went wrong'));
     const logger = new CoralogixLogger({
       apiKey: 'foo-id',

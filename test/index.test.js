@@ -80,9 +80,7 @@ describe('Index Tests', () => {
         }],
       });
 
-    nock('https://ingress.coralogix.com')
-      .matchHeader('authorization', `Bearer ${DEFAULT_ENV.CORALOGIX_API_KEY}`)
-      .post('/logs/v1/singles')
+    nock.coralogix({ auth: DEFAULT_ENV.CORALOGIX_API_KEY })
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'aws-account-id',
@@ -177,8 +175,7 @@ describe('Index Tests', () => {
       logStream: '2022/10/28/[$LATEST]dbbf94bd5cb34f00aa764103d8ed78f2',
     }))).toString('base64');
 
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'aws-account-id',
@@ -237,8 +234,7 @@ describe('Index Tests', () => {
         Aliases: [],
       });
 
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'aws-account-id',
@@ -351,8 +347,7 @@ describe('Index Tests', () => {
         }],
       });
 
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply(403, 'that went wrong');
 
     nock('https://sqs.us-east-1.amazonaws.com')
@@ -378,8 +373,7 @@ describe('Index Tests', () => {
     const { input, output } = JSON.parse(contents);
 
     const payload = (await gzip(JSON.stringify(input))).toString('base64');
-    nock('https://ingress.coralogix.com')
-      .post('/logs/v1/singles')
+    nock.coralogix()
       .reply((_, body) => {
         assert.deepStrictEqual(body, output);
         return [200];
