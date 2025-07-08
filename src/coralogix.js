@@ -85,7 +85,7 @@ export class CoralogixLogger {
       funcName,
       appName,
       log = console,
-      apiUrl = 'https://api.coralogix.com/api/v1/',
+      apiUrl = 'https://ingress.us1.coralogix.com/',
       level = 'info',
       logStream,
       subsystem,
@@ -105,10 +105,11 @@ export class CoralogixLogger {
 
   async sendPayload(payload) {
     try {
-      const resp = await fetch(new Request(path.join(this._apiUrl, '/logs'), {
+      const resp = await fetch(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
+          authorization: `Bearer ${this._apiKey}`,
         },
         body: JSON.stringify(payload),
       }));
@@ -175,7 +176,6 @@ export class CoralogixLogger {
     }
     if (logEntries.length) {
       const payload = {
-        privateKey: this._apiKey,
         applicationName: this._appName,
         subsystemName: this._subsystem,
         computerName: this._host,

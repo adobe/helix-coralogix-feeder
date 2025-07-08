@@ -80,8 +80,9 @@ describe('Index Tests', () => {
         }],
       });
 
-    nock('https://api.coralogix.com')
-      .post('/api/v1/logs')
+    nock('https://ingress.us1.coralogix.com')
+      .matchHeader('authorization', `Bearer ${DEFAULT_ENV.CORALOGIX_API_KEY}`)
+      .post('/logs/v1/singles')
       .reply((_, body) => {
         // eslint-disable-next-line no-param-reassign
         delete body.computerName;
@@ -140,7 +141,6 @@ describe('Index Tests', () => {
             }),
             severity: 3,
           }],
-          privateKey: DEFAULT_ENV.CORALOGIX_API_KEY,
           subsystemName: 'helix-services',
         });
         return [200];
@@ -175,8 +175,8 @@ describe('Index Tests', () => {
       logStream: '2022/10/28/[$LATEST]dbbf94bd5cb34f00aa764103d8ed78f2',
     }))).toString('base64');
 
-    nock('https://api.coralogix.com/api/v1/')
-      .post('/logs')
+    nock('https://ingress.us1.coralogix.com')
+      .post('/logs/v1/singles')
       .reply((_, body) => {
         assert.strictEqual(body.subsystemName, 'my-services');
         assert.deepStrictEqual(body.logEntries, [{
@@ -234,8 +234,8 @@ describe('Index Tests', () => {
         Aliases: [],
       });
 
-    nock('https://api.coralogix.com/api/v1/')
-      .post('/logs')
+    nock('https://ingress.us1.coralogix.com')
+      .post('/logs/v1/singles')
       .reply((_, body) => {
         assert.strictEqual(body.subsystemName, 'my-services');
         assert.deepStrictEqual(body.logEntries, [{
@@ -347,8 +347,8 @@ describe('Index Tests', () => {
         }],
       });
 
-    nock('https://api.coralogix.com/api/v1/')
-      .post('/logs')
+    nock('https://ingress.us1.coralogix.com')
+      .post('/logs/v1/singles')
       .reply(403, 'that went wrong');
 
     nock('https://sqs.us-east-1.amazonaws.com')
@@ -374,8 +374,8 @@ describe('Index Tests', () => {
     const { input, output } = JSON.parse(contents);
 
     const payload = (await gzip(JSON.stringify(input))).toString('base64');
-    nock('https://api.coralogix.com/api/v1/')
-      .post('/logs')
+    nock('https://ingress.us1.coralogix.com')
+      .post('/logs/v1/singles')
       .reply((_, body) => {
         // eslint-disable-next-line no-param-reassign
         delete body.computerName;

@@ -62,7 +62,6 @@
   },
   "output": {
     "applicationName": "aws-account-id",
-    "privateKey": "api-key",
     "subsystemName": "my-services",
     "logEntries": [
       {
