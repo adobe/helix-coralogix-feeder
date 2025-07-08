@@ -82,7 +82,6 @@ describe('Coralogix Tests', () => {
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'app',
-          computerName: 'my-computer',
           severity: 3,
           subsystemName: 'services',
           text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"this should be visible","level":"info"}',
@@ -94,7 +93,6 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
-      computerName: 'my-computer',
       level: 'chatty',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -122,7 +120,6 @@ describe('Coralogix Tests', () => {
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'app',
-          computerName: 'my-computer',
           severity: 4,
           subsystemName: 'services',
           text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"this should be visible","level":"warn"}',
@@ -134,7 +131,6 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
-      computerName: 'my-computer',
       level: 'warn',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -168,7 +164,6 @@ describe('Coralogix Tests', () => {
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'app',
-          computerName: 'my-computer',
           severity: 3,
           subsystemName: 'services',
           text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"Task timed out after 60.07 seconds","level":"info"}',
@@ -180,7 +175,6 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
-      computerName: 'my-computer',
       level: 'info',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -201,7 +195,6 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
-      computerName: 'my-computer',
       level: 'info',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -228,7 +221,6 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
-      computerName: 'my-computer',
       subsystem: 'my-services',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');

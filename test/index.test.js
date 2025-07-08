@@ -29,7 +29,6 @@ const DEFAULT_ENV = {
   AWS_SESSION_TOKEN: 'aws-session-token',
   CORALOGIX_API_KEY: 'api-key',
   CORALOGIX_LEVEL: 'info',
-  CORALOGIX_COMPUTER_NAME: 'my-computer',
 };
 
 describe('Index Tests', () => {
@@ -87,7 +86,6 @@ describe('Index Tests', () => {
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'aws-account-id',
-          computerName: 'my-computer',
           subsystemName: 'helix-services',
           timestamp: 1666708005982,
           text: JSON.stringify({
@@ -103,7 +101,6 @@ describe('Index Tests', () => {
           severity: 3,
         }, {
           applicationName: 'aws-account-id',
-          computerName: 'my-computer',
           subsystemName: 'helix-services',
           timestamp: 1666708006053,
           text: JSON.stringify({
@@ -119,7 +116,6 @@ describe('Index Tests', () => {
           severity: 3,
         }, {
           applicationName: 'aws-account-id',
-          computerName: 'my-computer',
           subsystemName: 'helix-services',
           timestamp: 1666708011188,
           text: JSON.stringify({
@@ -135,7 +131,6 @@ describe('Index Tests', () => {
           severity: 3,
         }, {
           applicationName: 'aws-account-id',
-          computerName: 'my-computer',
           subsystemName: 'helix-services',
           timestamp: 1666708011258,
           text: JSON.stringify({
@@ -187,7 +182,6 @@ describe('Index Tests', () => {
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'aws-account-id',
-          computerName: 'my-computer',
           subsystemName: 'my-services',
           timestamp: 1666708005982,
           text: JSON.stringify({
@@ -248,7 +242,6 @@ describe('Index Tests', () => {
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'aws-account-id',
-          computerName: 'my-computer',
           subsystemName: 'my-services',
           timestamp: 1666708005982,
           text: JSON.stringify({
@@ -388,8 +381,6 @@ describe('Index Tests', () => {
     nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .reply((_, body) => {
-        // eslint-disable-next-line no-param-reassign
-        delete body.computerName;
         assert.deepStrictEqual(body, output);
         return [200];
       });
@@ -416,7 +407,6 @@ describe('Index Tests', () => {
         new Request('https://localhost/'),
         createContext(payload, {
           ...DEFAULT_ENV,
-          CORALOGIX_COMPUTER_NAME: 'my-computer',
           CORALOGIX_SUBSYSTEM: 'my-services',
           CORALOGIX_LOG_LEVEL: 'debug',
         }),

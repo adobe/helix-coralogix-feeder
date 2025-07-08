@@ -12,7 +12,6 @@
 
 /* eslint-disable no-await-in-loop */
 
-import { hostname } from 'os';
 import path from 'path';
 import wrapFetch from 'fetch-retry';
 import { FetchError, Request } from '@adobe/fetch';
@@ -93,15 +92,19 @@ export class CoralogixLogger {
     } = opts;
 
     this._apiKey = apiKey;
-    this._appName = appName;
-    this._computerName = computerName || hostname();
     this._log = log;
     this._apiUrl = apiUrl;
     this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
     this._logStream = logStream;
-
     this._funcName = funcName;
-    this._subsystem = subsystem || funcName.split('/')[1];
+
+    this._baseEntry = {
+      applicationName: appName,
+      subsystemName: subsystem || funcName.split('/')[1],
+    };
+    if (computerName) {
+      this._baseEntry.computerName = computerName;
+    }
   }
 
   async sendPayload(payload) {
@@ -176,11 +179,9 @@ export class CoralogixLogger {
       }
     }
     if (logEntries.length) {
-      await this.sendPayload(logEntries.map((entry) => ({
-        ...entry,
-        applicationName: this._appName,
-        subsystemName: this._subsystem,
-        computerName: this._computerName,
+      await this.sendPayload(logEntries.map((logEntry) => ({
+        ...logEntry,
+        ...this._baseEntry,
       })));
     }
     return { rejected, sent: logEntries.length };
