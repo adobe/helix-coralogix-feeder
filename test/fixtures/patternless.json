@@ -60,55 +60,78 @@
       }
     ]
   },
-  "output": {
-    "applicationName": "aws-account-id",
-    "subsystemName": "my-services",
-    "logEntries": [
-      {
-        "timestamp": 1703249845822,
-        "text": "{\"inv\":{\"invocationId\":\"n/a\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"INIT_START Runtime Version: nodejs:18.v18\\tRuntime Version ARN: arn:aws:lambda:us-east-1::runtime:d949ec0248c1b8fbc8cbc6df1c986e05fb933506b51d53be82d46f9a37125bea\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 1
-      },
-      {
-        "timestamp": 1703176564631,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"START Version: $LATEST\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 1
-      },
-      {
-        "timestamp": 1703176565151,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"loaded 4 package parameter in 519ms\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.151Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
-      },
-      {
-        "timestamp": 1703176565173,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"This is a text message\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.173Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
-      },
-      {
-        "timestamp": 1703176565173,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"{ project: 'owner/repo', message: 'this is a structured message' }\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.173Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
-      },
-      {
-        "timestamp": 1703176565211,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"This is an exception Error\\n    at main (/var/task/index.js:8950:36)\\n    at lambdaAdapter (/var/task/index.js:3843:30)\\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\\n    at async Runtime.wrapped [as handler] (/var/task/index.js:3906:14)\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.211Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
-      },
-      {
-        "timestamp": 1703176565214,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"/var/task/files/hello.txt Hello, world.\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.214Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 3
-      },
-      {
-        "timestamp": 1703176565293,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"END\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 1
-      },
-      {
-        "timestamp": 1703176565293,
-        "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"REPORT Duration: 660.16 ms\\tBilled Duration: 661 ms\\tMemory Size: 128 MB\\tMax Memory Used: 73 MB\\tInit Duration: 234.44 ms\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
-        "severity": 1
-      }
-    ]
-  }
+  "output": [
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703249845822,
+      "text": "{\"inv\":{\"invocationId\":\"n/a\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"INIT_START Runtime Version: nodejs:18.v18\\tRuntime Version ARN: arn:aws:lambda:us-east-1::runtime:d949ec0248c1b8fbc8cbc6df1c986e05fb933506b51d53be82d46f9a37125bea\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 1
+    },
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703176564631,
+      "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"START Version: $LATEST\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 1
+    },
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703176565151,
+      "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"loaded 4 package parameter in 519ms\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.151Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 3
+    },
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703176565173,
+      "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"This is a text message\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.173Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 3
+    },
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703176565173,
+      "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"{ project: 'owner/repo', message: 'this is a structured message' }\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.173Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 3
+    },
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703176565211,
+      "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"This is an exception Error\\n    at main (/var/task/index.js:8950:36)\\n    at lambdaAdapter (/var/task/index.js:3843:30)\\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\\n    at async Runtime.wrapped [as handler] (/var/task/index.js:3906:14)\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.211Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 3
+    },
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703176565214,
+      "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"/var/task/files/hello.txt Hello, world.\",\"level\":\"info\",\"timestamp\":\"2023-12-21T16:36:05.214Z\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 3
+    },
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703176565293,
+      "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"END\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 1
+    },
+    {
+      "applicationName": "aws-account-id",
+      "computerName": "my-computer",
+      "subsystemName": "my-services",
+      "timestamp": 1703176565293,
+      "text": "{\"inv\":{\"invocationId\":\"576e61bb-40b7-4f8d-a6fb-da189d92c437\",\"functionName\":\"/my-services/my-func/$LATEST\"},\"message\":\"REPORT Duration: 660.16 ms\\tBilled Duration: 661 ms\\tMemory Size: 128 MB\\tMax Memory Used: 73 MB\\tInit Duration: 234.44 ms\",\"level\":\"debug\",\"logStream\":\"2023/12/21/my-services--my-func[$LATEST]b9bef68d412241e8be88efac966e2a5c\"}",
+      "severity": 1
+    }
+  ]
 }

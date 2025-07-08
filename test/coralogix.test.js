@@ -29,8 +29,11 @@ describe('Coralogix Tests', () => {
     nock('https://www.example.com')
       .post('/logs/v1/singles')
       .reply((_, body) => {
-        assert.deepStrictEqual(body.logEntries, [{
+        assert.deepStrictEqual(body, [{
+          applicationName: 'app',
+          computerName: 'my-computer',
           severity: 3,
+          subsystemName: 'services',
           text: '{"inv":{"invocationId":"d12ddc0c-1f6b-51d7-be22-83b52c83d6da","functionName":"/services/func/v1"},"message":"this should end up as INFO message","level":"bleep","timestamp":"2024-11-21T13:12:30.462Z"}',
           timestamp: 1668084827204,
         }]);
@@ -40,6 +43,7 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
+      computerName: 'my-computer',
       apiUrl: 'https://www.example.com/',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -73,11 +77,14 @@ describe('Coralogix Tests', () => {
   });
 
   it('invokes constructor with unknown log level, should be treated as info', async () => {
-    nock('https://ingress.us1.coralogix.com')
+    nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .reply((_, body) => {
-        assert.deepStrictEqual(body.logEntries, [{
+        assert.deepStrictEqual(body, [{
+          applicationName: 'app',
+          computerName: 'my-computer',
           severity: 3,
+          subsystemName: 'services',
           text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"this should be visible","level":"info"}',
           timestamp: 1668084827204,
         }]);
@@ -87,6 +94,7 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
+      computerName: 'my-computer',
       level: 'chatty',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -109,11 +117,14 @@ describe('Coralogix Tests', () => {
   });
 
   it('invokes constructor with higher log level, should filter other messages', async () => {
-    nock('https://ingress.us1.coralogix.com')
+    nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .reply((_, body) => {
-        assert.deepStrictEqual(body.logEntries, [{
+        assert.deepStrictEqual(body, [{
+          applicationName: 'app',
+          computerName: 'my-computer',
           severity: 4,
+          subsystemName: 'services',
           text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"this should be visible","level":"warn"}',
           timestamp: 1668084827204,
         }]);
@@ -123,6 +134,7 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
+      computerName: 'my-computer',
       level: 'warn',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -151,11 +163,14 @@ describe('Coralogix Tests', () => {
   });
 
   it('sends entry with no log level, should default to INFO', async () => {
-    nock('https://ingress.us1.coralogix.com')
+    nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .reply((_, body) => {
-        assert.deepStrictEqual(body.logEntries, [{
+        assert.deepStrictEqual(body, [{
+          applicationName: 'app',
+          computerName: 'my-computer',
           severity: 3,
+          subsystemName: 'services',
           text: '{"inv":{"invocationId":"n/a","functionName":"/services/func/v1"},"message":"Task timed out after 60.07 seconds","level":"info"}',
           timestamp: 1668084827204,
         }]);
@@ -165,6 +180,7 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
+      computerName: 'my-computer',
       level: 'info',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -185,6 +201,7 @@ describe('Coralogix Tests', () => {
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
+      computerName: 'my-computer',
       level: 'info',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -201,16 +218,17 @@ describe('Coralogix Tests', () => {
   });
 
   it('invokes constructor with customized subsystem', async () => {
-    nock('https://ingress.us1.coralogix.com')
+    nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .reply((_, body) => {
-        assert.strictEqual(body.subsystemName, 'my-services');
+        assert.strictEqual(body[0].subsystemName, 'my-services');
         return [200];
       });
     const logger = new CoralogixLogger({
       apiKey: 'foo-id',
       funcName: '/services/func/v1',
       appName: 'app',
+      computerName: 'my-computer',
       subsystem: 'my-services',
     });
     const date = new Date('2022-11-10T12:53:47.204Z');
@@ -233,7 +251,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('retries as many times as we have delays and stops when successful', async () => {
-    nock('https://ingress.us1.coralogix.com')
+    nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .replyWithError('that went wrong')
       .post('/logs/v1/singles')
@@ -254,7 +272,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('forwards error when posting throws when all delays are consumed', async () => {
-    nock('https://ingress.us1.coralogix.com')
+    nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .twice()
       .replyWithError('that went wrong');
@@ -275,7 +293,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('throws when posting returns a bad status code', async () => {
-    nock('https://ingress.us1.coralogix.com')
+    nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .reply(400, 'input malformed');
     const logger = new CoralogixLogger({
@@ -295,7 +313,7 @@ describe('Coralogix Tests', () => {
   });
 
   it('throws when posting returns an error other than FetchError', async () => {
-    nock('https://ingress.us1.coralogix.com')
+    nock('https://ingress.coralogix.com')
       .post('/logs/v1/singles')
       .replyWithError(new TypeError('something went wrong'));
     const logger = new CoralogixLogger({

@@ -1,11 +1,12 @@
 {
   "name": "@adobe/helix-coralogix-feeder",
-  "version": "1.7.2",
+  "version": "1.7.2-test",
   "private": true,
   "description": "Franklin Coralogix Feeder",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
+    "start": "nodemon",
     "test": "c8 mocha  -i -g 'Post-Deploy' --spec=test/**/*.test.js",
     "test-postdeploy": "mocha -g 'Post-Deploy' --spec=test/**/*.test.js",
     "lint": "eslint .",
@@ -21,7 +22,6 @@
     "nodeVersion": 22,
     "target": "aws",
     "name": "helix-services/coralogix-feeder@${version}",
-    "awsRole!important": "arn:aws:iam::118435662149:role/helix-service-role-s3-rw",
     "testUrl": "/_status_check/healthcheck.json",
     "memory": 1024,
     "fastlyServiceId!important": ""
@@ -47,6 +47,7 @@
   "homepage": "https://github.com/adobe/helix-coralogix-feeder#readme",
   "dependencies": {
     "@adobe/fetch": "4.2.2",
+    "@adobe/helix-shared-body-data": "2.1.11",
     "@adobe/helix-shared-wrap": "2.0.2",
     "@adobe/helix-status": "10.1.5",
     "aws4": "1.13.2",
@@ -56,6 +57,7 @@
     "@adobe/eslint-config-helix": "3.0.6",
     "@adobe/helix-deploy": "13.1.2",
     "@adobe/helix-universal": "5.2.2",
+    "@adobe/helix-universal-devserver": "1.1.129",
     "@adobe/semantic-release-coralogix": "1.1.38",
     "@eslint/config-helpers": "0.3.0",
     "@semantic-release/changelog": "6.0.3",
@@ -71,9 +73,18 @@
     "mocha-multi-reporters": "1.5.1",
     "mocha-suppress-logs": "0.6.0",
     "nock": "13.5.6",
+    "nodemon": "3.1.10",
     "semantic-release": "24.2.6"
   },
   "lint-staged": {
     "*.js": "eslint"
+  },
+  "nodemonConfig": {
+    "exec": "node --inspect ./test/dev/server.mjs",
+    "watch": [
+      ".env",
+      "."
+    ],
+    "ext": ".js, .cjs, .ejs, .css"
   }
 }

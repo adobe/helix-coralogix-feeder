@@ -84,8 +84,9 @@ export class CoralogixLogger {
       apiKey,
       funcName,
       appName,
+      computerName,
       log = console,
-      apiUrl = 'https://ingress.us1.coralogix.com/',
+      apiUrl = 'https://ingress.coralogix.com/',
       level = 'info',
       logStream,
       subsystem,
@@ -93,9 +94,9 @@ export class CoralogixLogger {
 
     this._apiKey = apiKey;
     this._appName = appName;
+    this._computerName = computerName || hostname();
     this._log = log;
     this._apiUrl = apiUrl;
-    this._host = hostname();
     this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
     this._logStream = logStream;
 
@@ -175,13 +176,12 @@ export class CoralogixLogger {
       }
     }
     if (logEntries.length) {
-      const payload = {
+      await this.sendPayload(logEntries.map((entry) => ({
+        ...entry,
         applicationName: this._appName,
         subsystemName: this._subsystem,
-        computerName: this._host,
-        logEntries,
-      };
-      await this.sendPayload(payload);
+        computerName: this._computerName,
+      })));
     }
     return { rejected, sent: logEntries.length };
   }
