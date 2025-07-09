@@ -22,6 +22,28 @@ import { mapSubsystem } from './subsystem.js';
 const gunzip = util.promisify(zlib.gunzip);
 
 /**
+ * Gets input to this function.
+ * @param {Request} request the request object (see fetch api)
+ * @param {UniversalContext} context the context of the universal serverless function
+ * @returns input
+ */
+async function getInput(request, context) {
+  const { invocation: { event } } = context;
+
+  if (request.method === 'POST' && request.headers.get('content-type') === 'application/json') {
+    const json = await request.json();
+    return json;
+  } else {
+    if (!event?.awslogs?.data) {
+      return null;
+    }
+    const payload = Buffer.from(event.awslogs.data, 'base64');
+    const uncompressed = await gunzip(payload);
+    return JSON.parse(uncompressed.toString());
+  }
+}
+
+/**
  * This is the main function
  * @param {Request} request the request object (see fetch api)
  * @param {UniversalContext} context the context of the universal serverless function
@@ -33,6 +55,7 @@ async function run(request, context) {
     env: {
       CORALOGIX_API_KEY: apiKey,
       CORALOGIX_SUBSYSTEM: defaultSubsystem,
+      CORALOGIX_COMPUTER_NAME: computerName,
       CORALOGIX_LOG_LEVEL: level = 'info',
     },
     func: {
@@ -41,10 +64,6 @@ async function run(request, context) {
     log,
   } = context;
 
-  if (!event?.awslogs?.data) {
-    log.info('No AWS logs payload in event');
-    return new Response('', { status: 204 });
-  }
   if (!apiKey) {
     const msg = 'No CORALOGIX_API_KEY set';
     log.error(msg);
@@ -54,9 +73,11 @@ async function run(request, context) {
   let input;
 
   try {
-    const payload = Buffer.from(event.awslogs.data, 'base64');
-    const uncompressed = await gunzip(payload);
-    input = JSON.parse(uncompressed.toString());
+    input = await getInput(request, context);
+    if (input === null) {
+      log.info('No AWS logs payload in event');
+      return new Response('', { status: 204 });
+    }
 
     const [,,, funcName] = input.logGroup.split('/');
     const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/[a-z-]*\[(\d+|\$LATEST)\]\w+/);
@@ -74,6 +95,7 @@ async function run(request, context) {
       apiKey,
       funcName: `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
       appName,
+      computerName,
       log,
       level,
       logStream: input.logStream,

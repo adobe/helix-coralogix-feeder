@@ -34,6 +34,14 @@ export function Nock() {
     return scope;
   }
 
+  nocker.coralogix = ({ url = 'https://ingress.coralogix.com', auth } = {}) => {
+    let scope = nocker(url);
+    if (auth) {
+      scope = scope.matchHeader('authorization', `Bearer ${auth}`);
+    }
+    return scope.post('/logs/v1/singles');
+  };
+
   nocker.done = () => {
     Object.values(scopes).forEach((s) => s.done());
     if (unmatched) {

@@ -12,7 +12,6 @@
 
 /* eslint-disable no-await-in-loop */
 
-import { hostname } from 'os';
 import path from 'path';
 import wrapFetch from 'fetch-retry';
 import { FetchError, Request } from '@adobe/fetch';
@@ -84,31 +83,37 @@ export class CoralogixLogger {
       apiKey,
       funcName,
       appName,
+      computerName,
       log = console,
-      apiUrl = 'https://api.coralogix.com/api/v1/',
+      apiUrl = 'https://ingress.coralogix.com/',
       level = 'info',
       logStream,
       subsystem,
     } = opts;
 
     this._apiKey = apiKey;
-    this._appName = appName;
     this._log = log;
     this._apiUrl = apiUrl;
-    this._host = hostname();
     this._severity = LOG_LEVEL_MAPPING[level.toUpperCase()] || LOG_LEVEL_MAPPING.INFO;
     this._logStream = logStream;
-
     this._funcName = funcName;
-    this._subsystem = subsystem || funcName.split('/')[1];
+
+    this._baseEntry = {
+      applicationName: appName,
+      subsystemName: subsystem || funcName.split('/')[1],
+    };
+    if (computerName) {
+      this._baseEntry.computerName = computerName;
+    }
   }
 
   async sendPayload(payload) {
     try {
-      const resp = await fetch(new Request(path.join(this._apiUrl, '/logs'), {
+      const resp = await fetch(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
+          authorization: `Bearer ${this._apiKey}`,
         },
         body: JSON.stringify(payload),
       }));
@@ -174,14 +179,10 @@ export class CoralogixLogger {
       }
     }
     if (logEntries.length) {
-      const payload = {
-        privateKey: this._apiKey,
-        applicationName: this._appName,
-        subsystemName: this._subsystem,
-        computerName: this._host,
-        logEntries,
-      };
-      await this.sendPayload(payload);
+      await this.sendPayload(logEntries.map((logEntry) => ({
+        ...logEntry,
+        ...this._baseEntry,
+      })));
     }
     return { rejected, sent: logEntries.length };
   }

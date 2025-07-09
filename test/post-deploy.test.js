@@ -20,12 +20,15 @@ createTargets().forEach((target) => {
     const fetchContext = noCache();
     const { fetch } = fetchContext;
 
-    afterEach(() => {
-      fetchContext.reset();
+    after(async () => {
+      await fetchContext.reset();
     });
 
     it('returns the status of the function', async () => {
-      const res = await fetch(`${target.host()}${target.urlPath()}/_status_check/healthcheck.json`);
+      const url = `${target.host()}${target.urlPath()}/_status_check/healthcheck.json`;
+      const res = await fetch(url, {
+        headers: target.headers,
+      });
       assert.strictEqual(res.status, 200);
       const json = await res.json();
       delete json.process;
@@ -40,9 +43,40 @@ createTargets().forEach((target) => {
       });
     }).timeout(50000);
 
-    it('invokes the function', async () => {
-      const res = await fetch(`${target.host()}${target.urlPath()}`);
+    it('invokes the function without arguments', async () => {
+      const url = `${target.host()}${target.urlPath()}`;
+      const res = await fetch(url, {
+        headers: target.headers,
+      });
       assert.strictEqual(res.status, 204);
+    }).timeout(50000);
+
+    it('invokes the function with a POST body', async () => {
+      const now = new Date();
+      const body = {
+        messageType: 'DATA_MESSAGE',
+        owner: '123456789012',
+        logGroup: `/aws/lambda/${target.package}--${target.name}`,
+        logStream: '2023/12/21/[$LATEST]b9bef68d412241e8be88efac966e2a5c',
+        subscriptionFilters: ['helix-coralogix-feeder'],
+        logEvents: [
+          {
+            id: '37982106607541042296547451702039639661941462854257278977',
+            timestamp: now.getTime(),
+            message: `${now.toISOString()}\t576e61bb-40b7-4f8d-a6fb-da189d92c437\tINFO\tthis should appear in Coralogix\n`,
+          },
+        ],
+      };
+      const url = `${target.host()}${target.urlPath()}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          ...target.headers,
+        },
+        body: JSON.stringify(body),
+      });
+      assert.strictEqual(res.status, 202);
     }).timeout(50000);
   });
 });
