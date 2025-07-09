@@ -20,12 +20,15 @@ createTargets().forEach((target) => {
     const fetchContext = noCache();
     const { fetch } = fetchContext;
 
-    afterEach(() => {
-      fetchContext.reset();
+    after(async () => {
+      await fetchContext.reset();
     });
 
     it('returns the status of the function', async () => {
-      const res = await fetch(`${target.host()}${target.urlPath()}/_status_check/healthcheck.json`);
+      const url = `${target.host()}${target.urlPath()}/_status_check/healthcheck.json`;
+      const res = await fetch(url, {
+        headers: target.headers,
+      });
       assert.strictEqual(res.status, 200);
       const json = await res.json();
       delete json.process;
@@ -41,7 +44,10 @@ createTargets().forEach((target) => {
     }).timeout(50000);
 
     it('invokes the function', async () => {
-      const res = await fetch(`${target.host()}${target.urlPath()}`);
+      const url = `${target.host()}${target.urlPath()}`;
+      const res = await fetch(url, {
+        headers: target.headers,
+      });
       assert.strictEqual(res.status, 204);
     }).timeout(50000);
   });
