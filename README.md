@@ -1,6 +1,6 @@
-# Franklin Coralogix Feeder
+# Helix Coralogix Feeder
 
-> Service that subscribes to CloudWatch logs for Franklin services and pushes them to Coralogix.
+> Service that subscribes to CloudWatch logs for Helix services and pushes them to Coralogix.
 
 ## Status
 [![codecov](https://img.shields.io/codecov/c/github/adobe/helix-coralogix-feeder.svg)](https://codecov.io/gh/adobe/helix-coralogix-feeder)
@@ -21,7 +21,7 @@ $ aws logs put-subscription-filter \
   --log-group-name /aws/lambda/helix-services--my-service \
   --filter-name helix-coralogix-feeder \
   --filter-pattern '[timestamp=*Z, request_id="*-*", event]' \
-  --destination-arn 'arn:aws:lambda:<region>:<accountid>:function:helix-services--coralogix-feeder:v1'
+  --destination-arn 'arn:aws:lambda:<region>:<accountid>:function:helix3--coralogix-feeder:v2'
 ```
 
 You can filter log events sent by level as follows:
@@ -33,7 +33,7 @@ this will invoke the feeder only for WARN and ERROR messages.
 If you get an error that CloudWatch is not allowed to execute your function, add the following permission:
 ```
 aws lambda add-permission \
-    --function-name 'arn:aws:lambda:<region>:<accountid>:function:helix-services--coralogix-feeder:v1' \
+    --function-name 'arn:aws:lambda:<region>:<accountid>:function:helix3--coralogix-feeder:v2' \
     --statement-id 'CloudWatchInvokeCoralogixFeeder' \
     --principal 'logs.amazonaws.com' \
     --action 'lambda:InvokeFunction' \
@@ -46,6 +46,7 @@ The service uses the following environment variables:
 | Name  | Description  | Required | Default |
 |:------|:-------------|:---------|:--------|
 | CORALOGIX_API_KEY | Coralogix Private Key | Yes | - |
+| CORALOGIX_COMPUTER_NAME | Computer name | No | - |
 | CORALOGIX_LOG_LEVEL | Log level | No | info |
 | CORALOGIX_SUBSYSTEM | Subsystem | No | second segment in log group name, e.g. `helix-services` |
 
@@ -55,4 +56,4 @@ If delivery to Coralogix fails, the service will send the unprocessed messages t
 
 ### Deploying Franklin Coralogix Feeder
 
-All commits to main that pass the testing will be deployed automatically. All commits to branches that will pass the testing will get commited as `helix-services--coralogix-feeder@ci<num>` and tagged with the CI build number.
+All commits to main that pass the testing will be deployed automatically. All commits to branches that will pass the testing will get commited as `helix3--coralogix-feeder@ci<num>` and tagged with the CI build number.
