@@ -2,7 +2,7 @@
   "name": "@adobe/helix-coralogix-feeder",
   "version": "1.7.2-test",
   "private": true,
-  "description": "Franklin Coralogix Feeder",
+  "description": "Helix Coralogix Feeder",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -12,19 +12,20 @@
     "lint": "eslint .",
     "semantic-release": "semantic-release",
     "commit": "git-cz",
-    "build": "hedy -v",
-    "deploy": "hedy -v --deploy --test",
+    "build": "hedy -v --test-bundle",
+    "deploy": "hedy -v --deploy --test --cleanup-patch=1w",
     "deploy-routes": "hedy --no-build --no-hints -l major",
-    "deploy-ci": "hedy -v --deploy --test --pkgVersion=ci$CIRCLE_BUILD_NUM -l ci --cleanup-ci 24h",
-    "prepare": "husky install"
+    "deploy-ci": "hedy -v --deploy --test --pkgVersion=ci$CIRCLE_BUILD_NUM -l ci --cleanup-ci 48h",
+    "prepare": "husky"
   },
   "wsk": {
-    "nodeVersion": 22,
     "target": "aws",
-    "name": "helix-services/coralogix-feeder@${version}",
-    "testUrl": "/_status_check/healthcheck.json",
+    "name": "helix3/coralogix-feeder@${version}",
     "memory": 1024,
-    "fastlyServiceId!important": ""
+    "testUrl": "/_status_check/healthcheck.json",
+    "awsAttachAuthorizer": "helix-token-authorizer_v2",
+    "fastlyServiceId!important": "",
+    "nodeVersion": 22
   },
   "mocha": {
     "require": [
@@ -47,7 +48,6 @@
   "homepage": "https://github.com/adobe/helix-coralogix-feeder#readme",
   "dependencies": {
     "@adobe/fetch": "4.2.2",
-    "@adobe/helix-shared-body-data": "2.1.11",
     "@adobe/helix-shared-wrap": "2.0.2",
     "@adobe/helix-status": "10.1.5",
     "aws4": "1.13.2",

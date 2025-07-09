@@ -12,7 +12,6 @@
 import util from 'util';
 import zlib from 'zlib';
 import { Response } from '@adobe/fetch';
-import bodyData from '@adobe/helix-shared-body-data';
 import wrap from '@adobe/helix-shared-wrap';
 import { helixStatus } from '@adobe/helix-status';
 import { CoralogixLogger } from './coralogix.js';
@@ -23,17 +22,17 @@ import { mapSubsystem } from './subsystem.js';
 const gunzip = util.promisify(zlib.gunzip);
 
 /**
- * Gets input to this
+ * Gets input to this function.
  * @param {Request} request the request object (see fetch api)
  * @param {UniversalContext} context the context of the universal serverless function
  * @returns input
  */
-async function getInput(context) {
+async function getInput(request, context) {
   const { invocation: { event } } = context;
 
-  /* c8 ignore next 3 */
-  if (process.env.HLX_DEV_SERVER_HOST) {
-    return context.data;
+  if (request.method === 'POST' && request.headers.get('content-type') === 'application/json') {
+    const json = await request.json();
+    return json;
   } else {
     if (!event?.awslogs?.data) {
       return null;
@@ -74,7 +73,7 @@ async function run(request, context) {
   let input;
 
   try {
-    input = await getInput(context);
+    input = await getInput(request, context);
     if (input === null) {
       log.info('No AWS logs payload in event');
       return new Response('', { status: 204 });
@@ -122,5 +121,4 @@ async function run(request, context) {
 }
 
 export const main = wrap(run)
-  .with(bodyData)
   .with(helixStatus);

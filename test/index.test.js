@@ -398,7 +398,11 @@ describe('Index Tests', () => {
 
     await assert.doesNotReject(
       async () => main(
-        new Request('https://localhost/'),
+        new Request('https://localhost/', {
+          method: 'POST',
+          body: JSON.stringify(input),
+          headers: { 'content-type': 'application/json' },
+        }),
         createContext(payload, {
           ...DEFAULT_ENV,
           CORALOGIX_SUBSYSTEM: 'my-services',
