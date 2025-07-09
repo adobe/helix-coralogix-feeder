@@ -1,3 +1,23 @@
+# [2.0.0](https://github.com/adobe/helix-coralogix-feeder/compare/v1.7.2...v2.0.0) (2025-07-09)
+
+
+### Bug Fixes
+
+* use new Coralogix API endpoint ([#415](https://github.com/adobe/helix-coralogix-feeder/issues/415)) ([8a0ed5d](https://github.com/adobe/helix-coralogix-feeder/commit/8a0ed5d32d63ece0abb302987b4c6a077f507617))
+
+
+### BREAKING CHANGES
+
+* JSON payload structure changed
+
+* chore(test): make POST location more easily changeable
+
+* fix: move to helix3
+
+* chore: pass target.headers
+
+* chore(test): fix logStream name
+
 ## [1.7.2](https://github.com/adobe/[secure]-coralogix-feeder/compare/v1.7.1...v1.7.2) (2025-06-27)
 
 
