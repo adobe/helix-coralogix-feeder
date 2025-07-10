@@ -70,7 +70,7 @@ export async function resolve(context, funcName, funcVersion) {
   }
   const resp = await fetchAliases(context, funcName, funcVersion);
   if (!resp.ok) {
-    const msg = `Failed to retrieve aliases for ${funcName} ${resp.status}: ${await resp.text()}`;
+    const msg = `Failed to retrieve aliases for ${funcName}: ${resp.status}`;
     log.warn(msg);
     return null;
   }
