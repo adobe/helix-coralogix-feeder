@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.1...v2.0.2) (2025-07-10)
+
+
+### Bug Fixes
+
+* do not await response.text ([e8643a7](https://github.com/adobe/helix-coralogix-feeder/commit/e8643a7e393da8f40fe0529883f8c4fd472075ce))
+
 ## [2.0.1](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.0...v2.0.1) (2025-07-10)
 
 
