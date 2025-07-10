@@ -30,17 +30,16 @@ const gunzip = util.promisify(zlib.gunzip);
 async function getInput(request, context) {
   const { invocation: { event } } = context;
 
-  if (request.method === 'POST' && request.headers.get('content-type') === 'application/json') {
-    const json = await request.json();
-    return json;
-  } else {
-    if (!event?.awslogs?.data) {
-      return null;
-    }
+  if (event?.awslogs?.data) {
     const payload = Buffer.from(event.awslogs.data, 'base64');
     const uncompressed = await gunzip(payload);
     return JSON.parse(uncompressed.toString());
   }
+  if (request.method === 'POST' && request.headers.get('content-type') === 'application/json') {
+    const json = await request.json();
+    return json;
+  }
+  return null;
 }
 
 /**

@@ -372,7 +372,6 @@ describe('Index Tests', () => {
     const contents = await fs.readFile(resolve(__rootdir, 'test', 'fixtures', 'patternless.json'));
     const { input, output } = JSON.parse(contents);
 
-    const payload = (await gzip(JSON.stringify(input))).toString('base64');
     nock.coralogix()
       .reply((_, body) => {
         assert.deepStrictEqual(body, output);
@@ -403,7 +402,7 @@ describe('Index Tests', () => {
           body: JSON.stringify(input),
           headers: { 'content-type': 'application/json' },
         }),
-        createContext(payload, {
+        createContext(null, {
           ...DEFAULT_ENV,
           CORALOGIX_SUBSYSTEM: 'my-services',
           CORALOGIX_LOG_LEVEL: 'debug',
