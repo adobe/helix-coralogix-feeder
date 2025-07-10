@@ -18,6 +18,7 @@ import { CoralogixLogger } from './coralogix.js';
 import { resolve } from './alias.js';
 import { sendToDLQ } from './dlq.js';
 import { mapSubsystem } from './subsystem.js';
+import { resetConnections } from './utils.js';
 
 const gunzip = util.promisify(zlib.gunzip);
 
@@ -116,6 +117,9 @@ async function run(request, context) {
       log.error(`Unable to send to DLQ: ${e2.message}`);
     }
     throw e;
+    /* c8 ignore next 3 */
+  } finally {
+    resetConnections();
   }
 }
 

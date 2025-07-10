@@ -10,13 +10,15 @@
  * governing permissions and limitations under the License.
  */
 import aws4 from 'aws4';
-import { fetchContext } from './support/utils.js';
+import { fetchContext } from './utils.js';
 
 /**
  * Send a message to our DLQ.
  *
  * @param {UniversalContext} context universal context
  * @param {any} message message to send
+ * @returns {Promise<void>}
+ * @throws {Promise<Error>} if something goes wrong
  */
 export async function sendToDLQ(context, message) {
   const {
@@ -40,37 +42,32 @@ export async function sendToDLQ(context, message) {
     throw new Error('Missing AWS configuration (aws_access_key_id or aws_secret_access_key)');
   }
 
-  try {
-    const { fetch } = fetchContext;
-    const body = {
-      Action: 'SendMessage',
-      Version: '2012-11-05',
-      QueueUrl: `https://sqs.${region}.amazonaws.com/${accountId}/helix-${name}-dlq`,
-      MessageBody: JSON.stringify(message),
-    };
-    const opts = {
-      host: `sqs.${region}.amazonaws.com`,
-      service: 'sqs',
-      region,
-      method: 'POST',
-      path: '/',
-      body: new URLSearchParams(body).toString(),
-    };
-    const req = aws4.sign(opts, {
-      accessKeyId: awsConfig.accessKeyId,
-      secretAccessKey: awsConfig.secretAccessKey,
-      sessionToken: awsConfig.sessionToken,
-    });
-    const resp = await fetch(`https://${req.host}${req.path}`, {
-      method: req.method,
-      headers: req.headers,
-      body: req.body,
-    });
-    if (!resp.ok) {
-      throw Error(`Failed to send logs with status ${resp.status}: ${await resp.text()}`);
-    }
-    /* c8 ignore next 3 */
-  } finally {
-    await fetchContext.reset();
+  const { fetch } = fetchContext;
+  const body = {
+    Action: 'SendMessage',
+    Version: '2012-11-05',
+    QueueUrl: `https://sqs.${region}.amazonaws.com/${accountId}/helix-${name}-dlq`,
+    MessageBody: JSON.stringify(message),
+  };
+  const opts = {
+    host: `sqs.${region}.amazonaws.com`,
+    service: 'sqs',
+    region,
+    method: 'POST',
+    path: '/',
+    body: new URLSearchParams(body).toString(),
+  };
+  const req = aws4.sign(opts, {
+    accessKeyId: awsConfig.accessKeyId,
+    secretAccessKey: awsConfig.secretAccessKey,
+    sessionToken: awsConfig.sessionToken,
+  });
+  const resp = await fetch(`https://${req.host}${req.path}`, {
+    method: req.method,
+    headers: req.headers,
+    body: req.body,
+  });
+  if (!resp.ok) {
+    throw Error(`Failed to send logs with status: ${resp.status}\n${await resp.text()}`);
   }
 }

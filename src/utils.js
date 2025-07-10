@@ -9,13 +9,17 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { context, h1 } from '@adobe/fetch';
+import { context, ALPN_HTTP1_1 } from '@adobe/fetch';
 
-/* c8 ignore next 7 */
-export const fetchContext = process.env.HELIX_FETCH_FORCE_HTTP1
-  ? h1({
-    userAgent: 'adobe-fetch', // static user-agent for recorded tests
-  })
-  : context({
-    userAgent: 'adobe-fetch', // static user-agent for recorded tests
-  });
+/**
+ * Our global fetch context that limits the number of sockets used.
+ */
+export const fetchContext = context({
+  maxCacheSize: 0,
+  alpnProtocols: [ALPN_HTTP1_1],
+  h1: { maxSockets: 512, maxTotalSockets: 768, keepAlive: true },
+});
+
+const { reset } = fetchContext;
+
+export const resetConnections = async () => reset();

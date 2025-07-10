@@ -15,8 +15,8 @@
 import path from 'path';
 import wrapFetch from 'fetch-retry';
 import { FetchError, Request } from '@adobe/fetch';
-import { fetchContext } from './support/utils.js';
 import { extractFields } from './extract-fields.js';
+import { fetchContext } from './utils.js';
 
 /**
  * @typedef LogEvent
@@ -32,6 +32,9 @@ import { extractFields } from './extract-fields.js';
  * @property {number} timestamp timestamp
  * @property {string} text JSON stringified object, containing various fields
  * @property {number} severity log level (see LOG_LEVEL_MAPPING)
+ * @property {string} applicationName application name
+ * @property {string} subsystemName subsystem
+ * @property {string?} computerName computer name
  */
 
 const LOG_LEVEL_MAPPING = {
@@ -44,14 +47,14 @@ const LOG_LEVEL_MAPPING = {
   SILLY: 1,
 };
 
-const { fetch: originalFetch } = fetchContext;
+const { fetch } = fetchContext;
 
 const MOCHA_ENV = (process.env.HELIX_FETCH_FORCE_HTTP1 === 'true');
 
 /**
  * Wrapped fetch that retries on certain conditions.
  */
-const fetch = wrapFetch(originalFetch, {
+const fetchRetry = wrapFetch(fetch, {
   retryDelay: (attempt) => {
     if (MOCHA_ENV) {
       return 1;
@@ -107,21 +110,23 @@ export class CoralogixLogger {
     }
   }
 
+  /**
+   * Send payload to Coralogix.
+   *
+   * @param {CoralogixLogEntry[]} payload payload
+   * @returns {Promise<Response>} HTTP answer
+   * @throws {Promise<Error>} if an error occurs
+   */
   async sendPayload(payload) {
-    try {
-      const resp = await fetch(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          authorization: `Bearer ${this._apiKey}`,
-        },
-        body: JSON.stringify(payload),
-      }));
-      return resp;
-      /* c8 ignore next 3 */
-    } finally {
-      await fetchContext.reset();
-    }
+    const resp = await fetchRetry(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${this._apiKey}`,
+      },
+      body: JSON.stringify(payload),
+    }));
+    return resp;
   }
 
   /**

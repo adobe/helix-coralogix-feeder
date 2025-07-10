@@ -90,7 +90,7 @@ describe('DLQ Tests', () => {
 
     await assert.rejects(
       async () => sendToDLQ(createContext(), message),
-      /Failed to send logs with status 403/,
+      /Failed to send logs with status: 403/,
     );
   });
 });

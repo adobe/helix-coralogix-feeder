@@ -11,10 +11,19 @@
  */
 import aws4 from 'aws4';
 import { Response } from '@adobe/fetch';
-import { fetchContext } from './support/utils.js';
+import { fetchContext } from './utils.js';
 
 const ALIAS_CACHE = {};
 
+/**
+ * Fetch aliases from AWS.
+ *
+ * @param {UniversalContext} context universal context
+ * @param {String} funcName function name
+ * @param {String} funcVersion function version
+ * @returns {Promise<Response>} HTTP answer
+ * @throws {Promise<Error>} if AWS credentials are not available
+ */
 async function fetchAliases(context, funcName, funcVersion) {
   const { env } = context;
 
@@ -56,9 +65,6 @@ async function fetchAliases(context, funcName, funcVersion) {
         'cache-control': 'no-store, private, must-revalidate',
       },
     });
-    /* c8 ignore next 3 */
-  } finally {
-    await fetchContext.reset();
   }
 }
 
@@ -70,7 +76,7 @@ export async function resolve(context, funcName, funcVersion) {
   }
   const resp = await fetchAliases(context, funcName, funcVersion);
   if (!resp.ok) {
-    const msg = `Failed to retrieve aliases for ${funcName}: ${resp.status}`;
+    const msg = `Failed to retrieve aliases for ${funcName}: ${resp.status}\n${await resp.text()}`;
     log.warn(msg);
     return null;
   }
