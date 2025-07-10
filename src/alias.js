@@ -11,7 +11,7 @@
  */
 import aws4 from 'aws4';
 import { Response } from '@adobe/fetch';
-import { fetchContext } from './support/utils.js';
+import { fetchContext } from './utils.js';
 
 const ALIAS_CACHE = {};
 
@@ -56,9 +56,6 @@ async function fetchAliases(context, funcName, funcVersion) {
         'cache-control': 'no-store, private, must-revalidate',
       },
     });
-    /* c8 ignore next 3 */
-  } finally {
-    await fetchContext.reset();
   }
 }
 
@@ -70,7 +67,7 @@ export async function resolve(context, funcName, funcVersion) {
   }
   const resp = await fetchAliases(context, funcName, funcVersion);
   if (!resp.ok) {
-    const msg = `Failed to retrieve aliases for ${funcName}: ${resp.status}`;
+    const msg = `Failed to retrieve aliases for ${funcName}: ${resp.status}\n${await resp.text()}`;
     log.warn(msg);
     return null;
   }

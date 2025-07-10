@@ -15,8 +15,8 @@
 import path from 'path';
 import wrapFetch from 'fetch-retry';
 import { FetchError, Request } from '@adobe/fetch';
-import { fetchContext } from './support/utils.js';
 import { extractFields } from './extract-fields.js';
+import { fetchContext } from './utils.js';
 
 /**
  * @typedef LogEvent
@@ -108,20 +108,15 @@ export class CoralogixLogger {
   }
 
   async sendPayload(payload) {
-    try {
-      const resp = await fetch(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          authorization: `Bearer ${this._apiKey}`,
-        },
-        body: JSON.stringify(payload),
-      }));
-      return resp;
-      /* c8 ignore next 3 */
-    } finally {
-      await fetchContext.reset();
-    }
+    const resp = await fetch(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${this._apiKey}`,
+      },
+      body: JSON.stringify(payload),
+    }));
+    return resp;
   }
 
   /**
