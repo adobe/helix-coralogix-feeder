@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.2...v2.0.3) (2025-07-10)
+
+
+### Bug Fixes
+
+* don't reset connection before reading response ([#418](https://github.com/adobe/helix-coralogix-feeder/issues/418)) ([de89afd](https://github.com/adobe/helix-coralogix-feeder/commit/de89afdd19500ae5b218738c861783adc1fe227c))
+
 ## [2.0.2](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.1...v2.0.2) (2025-07-10)
 
 
