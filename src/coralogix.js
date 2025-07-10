@@ -115,7 +115,7 @@ export class CoralogixLogger {
    *
    * @param {CoralogixLogEntry[]} payload payload
    * @returns {Promise<Response>} HTTP answer
-   * @throws {Promise<Error>} if AWS credentials are not available
+   * @throws {Promise<Error>} if an error occurs
    */
   async sendPayload(payload) {
     const resp = await fetchRetry(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
