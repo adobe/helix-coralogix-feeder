@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.0...v2.0.1) (2025-07-10)
+
+
+### Bug Fixes
+
+* check awslogs.data first, then POST body ([c3f9df1](https://github.com/adobe/helix-coralogix-feeder/commit/c3f9df14fdd72de7dc0ccada9311df7fc0c8b847))
+
 # [2.0.0](https://github.com/adobe/helix-coralogix-feeder/compare/v1.7.2...v2.0.0) (2025-07-09)
 
 
