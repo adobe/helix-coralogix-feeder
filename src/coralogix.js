@@ -44,14 +44,14 @@ const LOG_LEVEL_MAPPING = {
   SILLY: 1,
 };
 
-const { fetch: originalFetch } = fetchContext;
+const { fetch } = fetchContext;
 
 const MOCHA_ENV = (process.env.HELIX_FETCH_FORCE_HTTP1 === 'true');
 
 /**
  * Wrapped fetch that retries on certain conditions.
  */
-const fetch = wrapFetch(originalFetch, {
+const fetchRetry = wrapFetch(fetch, {
   retryDelay: (attempt) => {
     if (MOCHA_ENV) {
       return 1;
@@ -108,7 +108,7 @@ export class CoralogixLogger {
   }
 
   async sendPayload(payload) {
-    const resp = await fetch(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
+    const resp = await fetchRetry(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
       method: 'POST',
       headers: {
         'content-type': 'application/json',

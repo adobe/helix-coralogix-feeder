@@ -40,6 +40,7 @@ export async function sendToDLQ(context, message) {
     throw new Error('Missing AWS configuration (aws_access_key_id or aws_secret_access_key)');
   }
 
+  const { fetch } = fetchContext;
   const body = {
     Action: 'SendMessage',
     Version: '2012-11-05',
@@ -59,7 +60,6 @@ export async function sendToDLQ(context, message) {
     secretAccessKey: awsConfig.secretAccessKey,
     sessionToken: awsConfig.sessionToken,
   });
-  const { fetch } = fetchContext;
   const resp = await fetch(`https://${req.host}${req.path}`, {
     method: req.method,
     headers: req.headers,
