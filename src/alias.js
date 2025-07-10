@@ -15,6 +15,15 @@ import { fetchContext } from './utils.js';
 
 const ALIAS_CACHE = {};
 
+/**
+ * Fetch aliases from AWS.
+ *
+ * @param {UniversalContext} context universal context
+ * @param {String} funcName function name
+ * @param {String} funcVersion function version
+ * @returns {Promise<Response>} HTTP answer
+ * @throws {Promise<Error>} if AWS credentials are not available
+ */
 async function fetchAliases(context, funcName, funcVersion) {
   const { env } = context;
 

@@ -17,6 +17,8 @@ import { fetchContext } from './utils.js';
  *
  * @param {UniversalContext} context universal context
  * @param {any} message message to send
+ * @returns {Promise<void>}
+ * @throws {Promise<Error>} if something goes wrong
  */
 export async function sendToDLQ(context, message) {
   const {

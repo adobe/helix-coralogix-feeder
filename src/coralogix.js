@@ -32,6 +32,9 @@ import { fetchContext } from './utils.js';
  * @property {number} timestamp timestamp
  * @property {string} text JSON stringified object, containing various fields
  * @property {number} severity log level (see LOG_LEVEL_MAPPING)
+ * @property {string} applicationName application name
+ * @property {string} subsystemName subsystem
+ * @property {string?} computerName computer name
  */
 
 const LOG_LEVEL_MAPPING = {
@@ -107,6 +110,13 @@ export class CoralogixLogger {
     }
   }
 
+  /**
+   * Send payload to Coralogix.
+   *
+   * @param {CoralogixLogEntry[]} payload payload
+   * @returns {Promise<Response>} HTTP answer
+   * @throws {Promise<Error>} if AWS credentials are not available
+   */
   async sendPayload(payload) {
     const resp = await fetchRetry(new Request(path.join(this._apiUrl, '/logs/v1/singles'), {
       method: 'POST',
