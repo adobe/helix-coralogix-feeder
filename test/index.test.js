@@ -92,7 +92,7 @@ describe('Index Tests', () => {
                 invocationId: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
                 functionName: '/helix-services/indexer/v4',
               },
-              message: 'coralogix: flushing 1 pending requests...',
+              message: 'coralogix: flushing 1 pending requests...\n',
               level: 'info',
               timestamp: '2022-10-25T14:26:45.982Z',
               logStream: '2022/10/25/[663]877ef64aed7c456086d40a1de61a48cc',
@@ -105,7 +105,7 @@ describe('Index Tests', () => {
                 invocationId: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
                 functionName: '/helix-services/indexer/v4',
               },
-              message: 'coralogix: flushing 0 pending requests done.',
+              message: 'coralogix: flushing 0 pending requests done.\n',
               level: 'info',
               timestamp: '2022-10-25T14:26:46.051Z',
               logStream: '2022/10/25/[663]877ef64aed7c456086d40a1de61a48cc',
@@ -118,7 +118,7 @@ describe('Index Tests', () => {
                 invocationId: 'd7197ec0-1a12-407d-83c4-5a8900aa5c40',
                 functionName: '/helix-services/indexer/v4',
               },
-              message: 'coralogix: flushing 1 pending requests...',
+              message: 'coralogix: flushing 1 pending requests...\n',
               level: 'info',
               timestamp: '2022-10-25T14:26:51.188Z',
               logStream: '2022/10/25/[663]877ef64aed7c456086d40a1de61a48cc',
@@ -131,7 +131,7 @@ describe('Index Tests', () => {
                 invocationId: 'd7197ec0-1a12-407d-83c4-5a8900aa5c40',
                 functionName: '/helix-services/indexer/v4',
               },
-              message: 'coralogix: flushing 0 pending requests done.',
+              message: 'coralogix: flushing 0 pending requests done.\n',
               level: 'info',
               timestamp: '2022-10-25T14:26:51.257Z',
               logStream: '2022/10/25/[663]877ef64aed7c456086d40a1de61a48cc',
@@ -184,7 +184,7 @@ describe('Index Tests', () => {
               invocationId: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
               functionName: '/services/func/$LATEST',
             },
-            message: 'this\nis\na\nmessage',
+            message: 'this\nis\na\nmessage\n',
             level: 'info',
             timestamp: '2022-10-25T14:26:45.982Z',
             logStream: '2022/10/28/[$LATEST]dbbf94bd5cb34f00aa764103d8ed78f2',
@@ -243,7 +243,7 @@ describe('Index Tests', () => {
               invocationId: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
               functionName: '/services/func/356',
             },
-            message: 'this\nis\na\nmessage',
+            message: 'this\nis\na\nmessage\n',
             level: 'info',
             timestamp: '2022-10-25T14:26:45.982Z',
             logStream: '2022/10/28/[356]dbbf94bd5cb34f00aa764103d8ed78f2',
@@ -364,6 +364,281 @@ describe('Index Tests', () => {
     await assert.rejects(
       async () => main(new Request('https://localhost/'), createContext(payload)),
       /that went wrong/,
+    );
+  });
+
+  it('handles Step Function logs with timestamp and JSON format', async () => {
+    const stepFunctionLog = '2025-07-15T18:04:05.170Z\n{\n    "details": {\n        "input": "{\\"opportunityStatusJob\\":{\\"type\\":\\"opportunity-status-processor\\",\\"siteId\\":\\"f7128a8b-e62e-478e-ad97-c112fe030f89\\",\\"siteUrl\\":\\"https://infosys.com\\",\\"imsOrgId\\":\\"8C6043F15F43B6390A49401A@AdobeOrg\\",\\"organizationId\\":\\"44568c3e-efd4-4a7f-8ecd-8caf615f836c\\",\\"taskContext\\":{\\"auditTypes\\":[\\"scrape-top-pages\\",\\"broken-backlinks\\",\\"broken-internal-links\\",\\"experimentation-opportunities\\",\\"meta-tags\\",\\"sitemap\\",\\"cwv\\",\\"alt-text\\",\\"broken-backlinks-auto-suggest\\",\\"meta-tags-auto-suggest\\",\\"broken-internal-links-auto-suggest\\"],\\"slackContext\\":{\\"channelId\\":\\"C060T2PPF8V\\",\\"threadTs\\":\\"1752602636.998649\\"}}},\\"disableImportAndAuditJob\\":{\\"type\\":\\"disable-import-audit-processor\\",\\"siteId\\":\\"f7128a8b-e62e-478e-ad97-c112fe030f89\\",\\"siteUrl\\":\\"https://infosys.com\\",\\"imsOrgId\\":\\"8C6043F15F43B6390A49401A@AdobeOrg\\",\\"organizationId\\":\\"44568c3e-efd4-4a7f-8ecd-8caf615f836c\\",\\"taskContext\\":{\\"importTypes\\":[\\"organic-traffic\\",\\"top-pages\\",\\"organic-keywords\\",\\"all-traffic\\"],\\"auditTypes\\":[\\"scrape-top-pages\\",\\"broken-backlinks\\",\\"broken-internal-links\\",\\"experimentation-opportunities\\",\\"meta-tags\\",\\"sitemap\\",\\"cwv\\",\\"alt-text\\",\\"broken-backlinks-auto-suggest\\",\\"meta-tags-auto-suggest\\",\\"broken-internal-links-auto-suggest\\"],\\"slackContext\\":{\\"channelId\\":\\"C060T2PPF8V\\",\\"threadTs\\":\\"1752602636.998649\\"}}},\\"demoURLJob\\":{\\"type\\":\\"demo-url-processor\\",\\"siteId\\":\\"f7128a8b-e62e-478e-ad97-c112fe030f89\\",\\"siteUrl\\":\\"https://infosys.com\\",\\"imsOrgId\\":\\"8C6043F15F43B6390A49401A@AdobeOrg\\",\\"organizationId\\":\\"44568c3e-efd4-4a7f-8ecd-8caf615f836c\\",\\"taskContext\\":{\\"experienceUrl\\":\\"https://experience-stage.adobe.com\\",\\"slackContext\\":{\\"channelId\\":\\"C060T2PPF8V\\",\\"threadTs\\":\\"1752602636.998649\\"}}},\\"workflowWaitTime\\":2}","\n        "inputDetails": {\n            "truncated": false\n        },\n        "roleArn": "arn:aws:iam::682033462621:role/spacecat-services--onboard-workflow-role"\n    },\n    "redrive_count": "0",\n    "id": "1",\n    "type": "ExecutionStarted",\n    "previous_event_id": "0",\n    "event_timestamp": "1752602645170",\n    "execution_arn": "arn:aws:states:us-east-1:682033462621:execution:spacecat-dev-services--onboard-workflow:onboard-https---infosys-com-1752602645090"\n}';
+
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [{
+        timestamp: Date.now(),
+        message: stepFunctionLog,
+      }],
+      logGroup: '/aws/states/test-workflow',
+      logStream: 'test-execution/2025/01/15/00000000',
+    }))).toString('base64');
+
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'test');
+        assert.deepStrictEqual(body.logEntries, [{
+          timestamp: body.logEntries[0].timestamp,
+          text: JSON.stringify({
+            inv: {
+              invocationId: 'n/a',
+              functionName: '/test-workflow/test-workflow/$LATEST',
+            },
+            message: stepFunctionLog,
+            level: 'info',
+            timestamp: undefined,
+            logStream: 'test-execution/2025/01/15/00000000',
+          }),
+          severity: 3,
+        }]);
+        return [200];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'test' }),
+      ),
+    );
+  });
+
+  it('handles Step Function logs with timestamp but no JSON', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [{
+        timestamp: Date.now(),
+        message: '2025-07-15T18:04:05.170Z\nThis is a plain text message',
+      }],
+      logGroup: '/aws/states/test-workflow',
+      logStream: 'test-execution/2025/01/15/00000000',
+    }))).toString('base64');
+
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'test');
+        assert.deepStrictEqual(body.logEntries, [{
+          timestamp: body.logEntries[0].timestamp,
+          text: JSON.stringify({
+            inv: {
+              invocationId: 'n/a',
+              functionName: '/test-workflow/test-workflow/$LATEST',
+            },
+            message: '2025-07-15T18:04:05.170Z\nThis is a plain text message',
+            level: 'info',
+            timestamp: undefined,
+            logStream: 'test-execution/2025/01/15/00000000',
+          }),
+          severity: 3,
+        }]);
+        return [200];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'test' }),
+      ),
+    );
+  });
+
+  it('handles Step Function logs with single line message', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [{
+        timestamp: Date.now(),
+        message: 'Single line message',
+      }],
+      logGroup: '/aws/states/test-workflow',
+      logStream: 'test-execution/2025/01/15/00000000',
+    }))).toString('base64');
+
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'test');
+        assert.deepStrictEqual(body.logEntries, [{
+          timestamp: body.logEntries[0].timestamp,
+          text: JSON.stringify({
+            inv: {
+              invocationId: 'n/a',
+              functionName: '/test-workflow/test-workflow/$LATEST',
+            },
+            message: 'Single line message',
+            level: 'info',
+            timestamp: undefined,
+            logStream: 'test-execution/2025/01/15/00000000',
+          }),
+          severity: 3,
+        }]);
+        return [200];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'test' }),
+      ),
+    );
+  });
+
+  it('handles Step Function logs with invalid timestamp format', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [{
+        timestamp: Date.now(),
+        message: 'Invalid timestamp format\n{\n    "details": {\n        "input": "test"\n    }\n}',
+      }],
+      logGroup: '/aws/states/test-workflow',
+      logStream: 'test-execution/2025/01/15/00000000',
+    }))).toString('base64');
+
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'test');
+        assert.deepStrictEqual(body.logEntries, [{
+          timestamp: body.logEntries[0].timestamp,
+          text: JSON.stringify({
+            inv: {
+              invocationId: 'n/a',
+              functionName: '/test-workflow/test-workflow/$LATEST',
+            },
+            message: 'Invalid timestamp format\n{\n    "details": {\n        "input": "test"\n    }\n}',
+            level: 'info',
+            timestamp: undefined,
+            logStream: 'test-execution/2025/01/15/00000000',
+          }),
+          severity: 3,
+        }]);
+        return [200];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'test' }),
+      ),
+    );
+  });
+
+  it('handles Step Function logs with empty lines', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [{
+        timestamp: Date.now(),
+        message: '2025-07-15T18:04:05.170Z\n\n{\n    "details": {\n        "input": "test"\n    }\n}\n',
+      }],
+      logGroup: '/aws/states/test-workflow',
+      logStream: 'test-execution/2025/01/15/00000000',
+    }))).toString('base64');
+
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'test');
+        assert.deepStrictEqual(body.logEntries, [{
+          timestamp: body.logEntries[0].timestamp,
+          text: JSON.stringify({
+            inv: {
+              invocationId: 'n/a',
+              functionName: '/test-workflow/test-workflow/$LATEST',
+            },
+            message: '2025-07-15T18:04:05.170Z\n\n{\n    "details": {\n        "input": "test"\n    }\n}\n',
+            level: 'info',
+            timestamp: undefined,
+            logStream: 'test-execution/2025/01/15/00000000',
+          }),
+          severity: 3,
+        }]);
+        return [200];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'test' }),
+      ),
+    );
+  });
+
+  it('handles logs with no message or extractedFields', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [{
+        timestamp: Date.now(),
+        // No message or extractedFields
+      }],
+      logGroup: '/aws/states/test-workflow',
+      logStream: 'test-execution/2025/01/15/00000000',
+    }))).toString('base64');
+
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'test');
+        assert.deepStrictEqual(body.logEntries, [{
+          timestamp: body.logEntries[0].timestamp,
+          text: JSON.stringify({
+            inv: {
+              invocationId: 'n/a',
+              functionName: '/test-workflow/test-workflow/$LATEST',
+            },
+            message: 'Unknown log format',
+            level: 'info',
+            timestamp: undefined,
+            logStream: 'test-execution/2025/01/15/00000000',
+          }),
+          severity: 3,
+        }]);
+        return [200];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'test' }),
+      ),
+    );
+  });
+
+  it('handles non-standard log stream format gracefully', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [{
+        timestamp: Date.now(),
+        message: '2025-07-15T18:04:05.170Z\n{\n    "details": {\n        "input": "test"\n    }\n}',
+      }],
+      logGroup: '/aws/states/test-workflow',
+      logStream: 'non-standard-log-stream-format',
+    }))).toString('base64');
+
+    nock('https://api.coralogix.com')
+      .post('/api/v1/logs')
+      .reply((_, body) => {
+        assert.strictEqual(body.subsystemName, 'test');
+        assert.deepStrictEqual(body.logEntries, [{
+          timestamp: body.logEntries[0].timestamp,
+          text: JSON.stringify({
+            inv: {
+              invocationId: 'n/a',
+              functionName: '/test-workflow/test-workflow/$LATEST',
+            },
+            message: '2025-07-15T18:04:05.170Z\n{\n    "details": {\n        "input": "test"\n    }\n}',
+            level: 'info',
+            timestamp: undefined,
+            logStream: 'non-standard-log-stream-format',
+          }),
+          severity: 3,
+        }]);
+        return [200];
+      });
+
+    await assert.doesNotReject(
+      async () => main(
+        new Request('https://localhost/'),
+        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'test' }),
+      ),
     );
   });
 });

@@ -60,13 +60,18 @@ async function run(request, context) {
     log.info(`Received ${input.logEvents.length} event(s) for [${input.logGroup}][${input.logStream}]`);
 
     const [,,, funcName] = input.logGroup.split('/');
-    const [, funcVersion] = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[(\d+|\$LATEST)\]\w+/);
+    let packageName = funcName;
+    let serviceName = funcName;
+    if (funcName && funcName.includes('--')) {
+      [packageName, serviceName] = funcName.split('--');
+    }
+    const match = input.logStream.match(/\d{4}\/\d{2}\/\d{2}\/\[(\d+|\$LATEST)\]\w+/);
+    const [, funcVersion] = match || [null, '$LATEST'];
 
     let alias;
     if (funcVersion !== '$LATEST') {
       alias = await resolve(context, funcName, funcVersion);
     }
-    const [packageName, serviceName] = funcName.split('--');
 
     // Use mapped subsystem if available, else fallback to default
     const subsystem = mapSubsystem(alias ?? funcVersion, context) || defaultSubsystem;

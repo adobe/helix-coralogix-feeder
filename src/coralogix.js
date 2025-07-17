@@ -68,10 +68,12 @@ export class CoralogixLogger {
         body: JSON.stringify(payload),
       }));
       return resp;
-      /* c8 ignore next 3 */
-    } finally {
+    }
+    /* c8 ignore start */
+    finally {
       await fetchContext.reset();
     }
+    /* c8 ignore end */
   }
 
   async sendPayloadWithRetries(payload) {
@@ -94,19 +96,66 @@ export class CoralogixLogger {
 
   async sendEntries(entries) {
     const logEntries = entries
-      .map(({ timestamp, extractedFields }) => {
-        let [level, message] = extractedFields.event.split('\t');
-        if (message === undefined) {
-          [level, message] = (['INFO', level]);
+      .map(({ timestamp, extractedFields, message }) => {
+        let level, messageText;
+        
+        // Handle new Step Function format: timestamp on first line, JSON on subsequent lines
+        if (message) {
+          const lines = message.split('\n').filter(line => line.trim());
+          if (lines.length >= 2) {
+            // Check if first line is a timestamp and second line starts with {
+            const firstLine = lines[0].trim();
+            const secondLine = lines[1].trim();
+            
+            if (firstLine.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/) && 
+                secondLine.startsWith('{')) {
+              // This is the new Step Function format
+              level = 'INFO';
+              messageText = message;
+              const text = {
+                inv: {
+                  invocationId: extractedFields?.request_id || 'n/a',
+                  functionName: this._funcName,
+                },
+                message: messageText,
+                level: level.toLowerCase(),
+                timestamp: extractedFields?.timestamp,
+              };
+              if (this._logStream) {
+                text.logStream = this._logStream;
+              }
+              return {
+                timestamp,
+                text: JSON.stringify(text),
+                severity: LOG_LEVEL_MAPPING[level] || LOG_LEVEL_MAPPING.INFO,
+              };
+            }
+          }
         }
+        
+        // Handle existing Lambda format with extractedFields.event
+        if (extractedFields?.event) {
+          const parts = extractedFields.event.split('\t');
+          level = parts[1] ? parts[0] : 'INFO';
+          messageText = parts[1] ? parts[1] : parts[0];
+        } else if (message) {
+          // Handle case where message is directly available but not in new format
+          level = 'INFO';
+          messageText = message;
+        } else {
+          // Fallback for unknown format
+          level = 'INFO';
+          messageText = 'Unknown log format';
+        }
+        
         const text = {
           inv: {
-            invocationId: extractedFields.request_id || 'n/a',
+            invocationId: extractedFields?.request_id || 'n/a',
             functionName: this._funcName,
           },
-          message: message.trimEnd(),
+          message: messageText,
           level: level.toLowerCase(),
-          timestamp: extractedFields.timestamp,
+          timestamp: extractedFields?.timestamp,
         };
         if (this._logStream) {
           text.logStream = this._logStream;
