@@ -4,7 +4,7 @@
 
 ## Status
 [![codecov](https://img.shields.io/codecov/c/github/adobe/helix-coralogix-feeder.svg)](https://codecov.io/gh/adobe/helix-coralogix-feeder)
-[![CircleCI](https://img.shields.io/circleci/project/github/adobe/helix-coralogix-feeder.svg)](https://circleci.com/gh/adobe/helix-coralogix-feeder)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/adobe-rnd/spacecat-coralogix-feeder/ci.yaml?branch=main)](https://github.com/adobe-rnd/spacecat-coralogix-feeder/actions/workflows/ci.yaml)
 [![GitHub license](https://img.shields.io/github/license/adobe/helix-coralogix-feeder.svg)](https://github.com/adobe/helix-coralogix-feeder/blob/main/LICENSE.txt)
 [![GitHub issues](https://img.shields.io/github/issues/adobe/helix-coralogix-feeder.svg)](https://github.com/adobe/helix-coralogix-feeder/issues)
 [![LGTM Code Quality Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/adobe/helix-coralogix-feeder.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/adobe/helix-coralogix-feeder)
