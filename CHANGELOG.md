@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.3...v2.0.4) (2025-09-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @adobe/fetch to v4.2.3 ([#445](https://github.com/adobe/helix-coralogix-feeder/issues/445)) ([9ce606b](https://github.com/adobe/helix-coralogix-feeder/commit/9ce606b92aa081352b2dbe9e52df3e04d21a54fb))
+
 ## [2.0.3](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.2...v2.0.3) (2025-07-10)
 
 
