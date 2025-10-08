@@ -54,6 +54,7 @@ async function run(request, context) {
     invocation: { event },
     env: {
       CORALOGIX_API_KEY: apiKey,
+      CORALOGIX_API_URL: apiUrl,
       CORALOGIX_SUBSYSTEM: defaultSubsystem,
       CORALOGIX_COMPUTER_NAME: computerName,
       CORALOGIX_LOG_LEVEL: level = 'info',
@@ -97,6 +98,7 @@ async function run(request, context) {
       appName,
       computerName,
       log,
+      apiUrl,
       level,
       logStream: input.logStream,
       subsystem,
