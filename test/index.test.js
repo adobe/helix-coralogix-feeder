@@ -41,7 +41,7 @@ describe('Index Tests', () => {
     nock.done();
   });
 
-  const createContext = (data, env = DEFAULT_ENV) => ({
+  const TEST_CONTEXT = (data, env = DEFAULT_ENV) => ({
     invocation: {
       event: {
         awslogs: {
@@ -63,7 +63,7 @@ describe('Index Tests', () => {
 
   it('invokes index without payload', async () => {
     await assert.doesNotReject(
-      async () => main(new Request('https://localhost/'), createContext()),
+      async () => main(new Request('https://localhost/'), TEST_CONTEXT()),
     );
   });
 
@@ -147,7 +147,7 @@ describe('Index Tests', () => {
       });
 
     await assert.doesNotReject(
-      async () => main(new Request('https://localhost/'), createContext(payload)),
+      async () => main(new Request('https://localhost/'), TEST_CONTEXT(payload)),
     );
   });
 
@@ -199,7 +199,7 @@ describe('Index Tests', () => {
     await assert.doesNotReject(
       async () => main(
         new Request('https://localhost/'),
-        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'my-services' }),
+        TEST_CONTEXT(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'my-services' }),
       ),
     );
   });
@@ -234,7 +234,7 @@ describe('Index Tests', () => {
         Aliases: [],
       });
 
-    nock.coralogix()
+    nock.coralogix({ url: 'https://ingress.eu1.coralogix.com' })
       .reply((_, body) => {
         assert.deepStrictEqual(body, [{
           applicationName: 'aws-account-id',
@@ -258,7 +258,11 @@ describe('Index Tests', () => {
     await assert.doesNotReject(
       async () => main(
         new Request('https://localhost/'),
-        createContext(payload, { ...DEFAULT_ENV, CORALOGIX_SUBSYSTEM: 'my-services' }),
+        TEST_CONTEXT(payload, {
+          ...DEFAULT_ENV,
+          CORALOGIX_SUBSYSTEM: 'my-services',
+          CORALOGIX_API_URL: 'https://ingress.eu1.coralogix.com/',
+        }),
       ),
     );
   });
@@ -279,7 +283,7 @@ describe('Index Tests', () => {
 </SendMessageResponse>
 `);
     await assert.rejects(
-      async () => main(new Request('https://localhost/'), createContext(payload)),
+      async () => main(new Request('https://localhost/'), TEST_CONTEXT(payload)),
       /incorrect header check/,
     );
   });
@@ -299,7 +303,7 @@ describe('Index Tests', () => {
     const env = { ...DEFAULT_ENV };
     delete env.CORALOGIX_API_KEY;
 
-    const res = await main(new Request('https://localhost/'), createContext(payload, env));
+    const res = await main(new Request('https://localhost/'), TEST_CONTEXT(payload, env));
     assert.strictEqual(res.status, 500);
     assert.strictEqual(await res.text(), 'No CORALOGIX_API_KEY set');
   });
@@ -320,7 +324,7 @@ describe('Index Tests', () => {
     delete env.AWS_SECRET_ACCESS_KEY;
 
     await assert.rejects(
-      async () => main(new Request('https://localhost/'), createContext(payload, env)),
+      async () => main(new Request('https://localhost/'), TEST_CONTEXT(payload, env)),
       /Missing AWS configuration/,
     );
   });
@@ -363,7 +367,7 @@ describe('Index Tests', () => {
 </SendMessageResponse>
 `);
     await assert.rejects(
-      async () => main(new Request('https://localhost/'), createContext(payload)),
+      async () => main(new Request('https://localhost/'), TEST_CONTEXT(payload)),
       /that went wrong/,
     );
   });
@@ -402,7 +406,7 @@ describe('Index Tests', () => {
           body: JSON.stringify(input),
           headers: { 'content-type': 'application/json' },
         }),
-        createContext(null, {
+        TEST_CONTEXT(null, {
           ...DEFAULT_ENV,
           CORALOGIX_SUBSYSTEM: 'my-services',
           CORALOGIX_LOG_LEVEL: 'debug',
