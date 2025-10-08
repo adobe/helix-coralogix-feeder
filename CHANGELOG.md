@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.4...v2.1.0) (2025-10-08)
+
+
+### Features
+
+* allow taking endpoint URL from env ([#453](https://github.com/adobe/helix-coralogix-feeder/issues/453)) ([a5efd53](https://github.com/adobe/helix-coralogix-feeder/commit/a5efd531992f65ddf7e21fd85c89b2823a5cdc12))
+
 ## [2.0.4](https://github.com/adobe/helix-coralogix-feeder/compare/v2.0.3...v2.0.4) (2025-09-15)
 
 
