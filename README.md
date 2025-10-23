@@ -17,11 +17,11 @@ The AWS Console has an issue where a subscription filter can not be added with a
 Given the service you want to push logs into Coralogix for, e.g. `helix-services--my-service`, use the following command:
 
 ```
-$ aws logs put-subscription-filter \
+$ AWS_REGION=...; AWS_ACCOUNT_ID=...; aws logs put-subscription-filter \
   --log-group-name /aws/lambda/helix-services--my-service \
   --filter-name helix-coralogix-feeder \
   --filter-pattern '[timestamp=*Z, request_id="*-*", event]' \
-  --destination-arn 'arn:aws:lambda:<region>:<accountid>:function:helix3--coralogix-feeder:v2'
+  --destination-arn "arn:aws:lambda:${AWS_REGION}:${AWS_ACCOUNT_ID}:function:helix3--coralogix-feeder:v2"
 ```
 
 You can filter log events sent by level as follows:
@@ -32,13 +32,18 @@ this will invoke the feeder only for WARN and ERROR messages.
 
 If you get an error that CloudWatch is not allowed to execute your function, add the following permission:
 ```
-aws lambda add-permission \
-    --function-name 'arn:aws:lambda:<region>:<accountid>:function:helix3--coralogix-feeder:v2' \
+$ AWS_REGION=...; AWS_ACCOUNT_ID=...; aws lambda add-permission \
+    --function-name "arn:aws:lambda:${AWS_REGION}:${AWS_ACCOUNT_ID}:function:helix3--coralogix-feeder:v2" \
     --statement-id 'CloudWatchInvokeCoralogixFeeder' \
     --principal 'logs.amazonaws.com' \
     --action 'lambda:InvokeFunction' \
-    --source-arn 'arn:aws:logs:<region>:<accountId>:log-group:/aws/lambda/helix-services--my-service:*' \
-    --source-account '<accountId>'
+    --source-arn "arn:aws:logs:${AWS_REGION}:${AWS_ACCOUNT_ID}:log-group:/aws/lambda/helix-services--my-service:*" \
+    --source-account "${AWS_ACCOUNT_ID}$"
+```
+If there are multiple services you want to add this subscription filter to, it is easier to replace the source arn
+with a more generic expression:
+```
+    --source-arn "arn:aws:logs:${AWS_REGION}:${AWS_ACCOUNT_ID}:log-group:/aws/lambda/*:*"
 ```
 
 The service uses the following environment variables:
@@ -46,6 +51,7 @@ The service uses the following environment variables:
 | Name  | Description  | Required | Default |
 |:------|:-------------|:---------|:--------|
 | CORALOGIX_API_KEY | Coralogix Private Key | Yes | - |
+| CORALOGIX_API_URL | Coralogix Ingestion Base URL | No | https://ingress.coralogix.com/ |
 | CORALOGIX_COMPUTER_NAME | Computer name | No | - |
 | CORALOGIX_LOG_LEVEL | Log level | No | info |
 | CORALOGIX_SUBSYSTEM | Subsystem | No | second segment in log group name, e.g. `helix-services` |
