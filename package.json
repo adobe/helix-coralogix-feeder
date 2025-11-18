@@ -54,7 +54,7 @@
     "fetch-retry": "6.0.0"
   },
   "devDependencies": {
-    "@adobe/eslint-config-helix": "3.0.13",
+    "@adobe/eslint-config-helix": "3.0.14",
     "@adobe/helix-deploy": "13.1.22",
     "@adobe/helix-universal": "5.3.0",
     "@adobe/helix-universal-devserver": "1.1.141",
