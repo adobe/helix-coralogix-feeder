@@ -31,6 +31,13 @@ const DEFAULT_ENV = {
   CORALOGIX_LEVEL: 'info',
 };
 
+const DUAL_ENV = {
+  ...DEFAULT_ENV,
+  CLICKHOUSE_HOST: 'ch.example.cloud',
+  CLICKHOUSE_USER: 'writer',
+  CLICKHOUSE_PASSWORD: 'secret',
+};
+
 describe('Index Tests', () => {
   let nock;
   beforeEach(() => {
@@ -412,6 +419,113 @@ describe('Index Tests', () => {
           CORALOGIX_LOG_LEVEL: 'debug',
         }),
       ),
+    );
+  });
+
+  it('sends to both Coralogix and ClickHouse when both configured', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [
+        {
+          extractedFields: {
+            event: 'INFO\thello dual\n',
+            request_id: '1aa49921-c9b8-401c-9f3a-f22989ab8505',
+            timestamp: '2022-10-25T14:26:45.982Z',
+          },
+          timestamp: 1666708005982,
+        },
+      ],
+      logGroup: '/aws/lambda/services--func',
+      logStream: '2022/10/28/[$LATEST]dbbf94bd5cb34f00aa764103d8ed78f2',
+    }))).toString('base64');
+
+    nock.coralogix()
+      .reply(200);
+
+    nock.clickhouse()
+      .reply((_, body) => {
+        const raw = typeof body === 'string' ? body : JSON.stringify(body);
+        const lines = raw.trim().split('\n');
+        assert.strictEqual(lines.length, 1);
+        const entry = JSON.parse(lines[0]);
+        assert.strictEqual(entry.function_name, '/services/func/$LATEST');
+        assert.strictEqual(entry.message, 'hello dual');
+        return [200];
+      });
+
+    const res = await main(
+      new Request('https://localhost/'),
+      TEST_CONTEXT(payload, DUAL_ENV),
+    );
+    assert.strictEqual(res.status, 202);
+  });
+
+  it('ClickHouse failure does NOT throw when Coralogix succeeds', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [
+        {
+          extractedFields: {
+            event: 'INFO\tmessage\n',
+          },
+          timestamp: Date.now(),
+        },
+      ],
+      logGroup: '/aws/lambda/services--func',
+      logStream: '2022/10/28/[$LATEST]dbbf94bd5cb34f00aa764103d8ed78f2',
+    }))).toString('base64');
+
+    nock.coralogix()
+      .reply(200);
+
+    nock.clickhouse()
+      .twice()
+      .replyWithError('clickhouse down');
+
+    const res = await main(
+      new Request('https://localhost/'),
+      TEST_CONTEXT(payload, DUAL_ENV),
+    );
+    assert.strictEqual(res.status, 202);
+  });
+
+  it('Coralogix failure throws even when ClickHouse succeeds', async () => {
+    const payload = (await gzip(JSON.stringify({
+      logEvents: [
+        {
+          extractedFields: {
+            event: 'INFO\tmessage\n',
+          },
+          timestamp: Date.now(),
+        },
+      ],
+      logGroup: '/aws/lambda/services--func',
+      logStream: '2022/10/28/[$LATEST]dbbf94bd5cb34f00aa764103d8ed78f2',
+    }))).toString('base64');
+
+    nock.coralogix()
+      .reply(403, 'forbidden');
+
+    nock.clickhouse()
+      .reply(200);
+
+    nock('https://sqs.us-east-1.amazonaws.com')
+      .post('/')
+      .reply(200, `<?xml version="1.0"?>
+<SendMessageResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+  <SendMessageResult>
+    <MessageId>id</MessageId>
+  </SendMessageResult>
+  <ResponseMetadata>
+    <RequestId>id</RequestId>
+  </ResponseMetadata>
+</SendMessageResponse>
+`);
+
+    await assert.rejects(
+      async () => main(
+        new Request('https://localhost/'),
+        TEST_CONTEXT(payload, DUAL_ENV),
+      ),
+      /forbidden/,
     );
   });
 });

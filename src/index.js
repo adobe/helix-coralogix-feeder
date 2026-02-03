@@ -15,6 +15,7 @@ import { Response } from '@adobe/fetch';
 import wrap from '@adobe/helix-shared-wrap';
 import { helixStatus } from '@adobe/helix-status';
 import { CoralogixLogger } from './coralogix.js';
+import { ClickHouseLogger } from './clickhouse.js';
 import { resolve } from './alias.js';
 import { sendToDLQ } from './dlq.js';
 import { mapSubsystem } from './subsystem.js';
@@ -58,6 +59,10 @@ async function run(request, context) {
       CORALOGIX_SUBSYSTEM: defaultSubsystem,
       CORALOGIX_COMPUTER_NAME: computerName,
       CORALOGIX_LOG_LEVEL: level = 'info',
+      CLICKHOUSE_HOST: clickhouseHost,
+      CLICKHOUSE_USER: clickhouseUser,
+      CLICKHOUSE_PASSWORD: clickhousePassword,
+      CLICKHOUSE_DATABASE: clickhouseDatabase,
     },
     func: {
       app: appName,
@@ -92,9 +97,11 @@ async function run(request, context) {
     // Use mapped subsystem if available, else fallback to default
     const subsystem = mapSubsystem(alias ?? funcVersion, context) || defaultSubsystem;
 
-    const logger = new CoralogixLogger({
+    const funcPath = `/${packageName}/${serviceName}/${alias ?? funcVersion}`;
+
+    const coralogixLogger = new CoralogixLogger({
       apiKey,
-      funcName: `/${packageName}/${serviceName}/${alias ?? funcVersion}`,
+      funcName: funcPath,
       appName,
       computerName,
       log,
@@ -103,8 +110,48 @@ async function run(request, context) {
       logStream: input.logStream,
       subsystem,
     });
-    const { rejected, sent } = await logger.sendEntries(input.logEvents);
-    log.info(`Received ${input.logEvents.length} event(s) for [${input.logGroup}][${input.logStream}], sent: ${sent}`);
+
+    const sends = [coralogixLogger.sendEntries(input.logEvents)];
+
+    const clickhouseEnabled = clickhouseHost && clickhouseUser && clickhousePassword;
+    if (clickhouseEnabled) {
+      const clickhouseLogger = new ClickHouseLogger({
+        host: clickhouseHost,
+        user: clickhouseUser,
+        password: clickhousePassword,
+        database: clickhouseDatabase,
+        funcName: funcPath,
+        appName,
+        log,
+        level,
+        logStream: input.logStream,
+        logGroup: input.logGroup,
+        subsystem,
+      });
+      sends.push(clickhouseLogger.sendEntries(input.logEvents));
+    }
+
+    const results = await Promise.allSettled(sends);
+
+    // Coralogix result (index 0): failure must throw (triggers DLQ)
+    const coralogixResult = results[0];
+    if (coralogixResult.status === 'rejected') {
+      throw coralogixResult.reason;
+    }
+
+    const { rejected, sent } = coralogixResult.value;
+    log.info(`Received ${input.logEvents.length} event(s) for [${input.logGroup}][${input.logStream}], sent to Coralogix: ${sent}`);
+
+    // ClickHouse result (index 1): failure is logged but does not throw
+    if (clickhouseEnabled) {
+      const clickhouseResult = results[1];
+      if (clickhouseResult.status === 'rejected') {
+        log.error(`ClickHouse send failed: ${clickhouseResult.reason.message}`);
+      } else {
+        log.info(`Sent ${clickhouseResult.value.sent} event(s) to ClickHouse`);
+      }
+    }
+
     if (rejected.length) {
       await sendToDLQ(context, rejected);
     }

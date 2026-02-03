@@ -17,6 +17,7 @@ import wrapFetch from 'fetch-retry';
 import { FetchError, Request } from '@adobe/fetch';
 import { extractFields } from './extract-fields.js';
 import { fetchContext } from './utils.js';
+import { LOG_LEVEL_MAPPING } from './constants.js';
 
 /**
  * @typedef LogEvent
@@ -36,16 +37,6 @@ import { fetchContext } from './utils.js';
  * @property {string} subsystemName subsystem
  * @property {string?} computerName computer name
  */
-
-const LOG_LEVEL_MAPPING = {
-  ERROR: 5,
-  WARN: 4,
-  INFO: 3,
-  VERBOSE: 2,
-  DEBUG: 1,
-  TRACE: 1,
-  SILLY: 1,
-};
 
 const { fetch } = fetchContext;
 
