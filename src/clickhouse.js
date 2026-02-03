@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Adobe. All rights reserved.
+ * Copyright 2026 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -12,38 +12,12 @@
 
 /* eslint-disable no-await-in-loop */
 
-import wrapFetch from 'fetch-retry';
-import { FetchError, Request } from '@adobe/fetch';
+import { Request } from '@adobe/fetch';
 import { extractFields } from './extract-fields.js';
-import { fetchContext } from './utils.js';
+import { createFetchRetry } from './utils.js';
 import { LOG_LEVEL_MAPPING } from './constants.js';
 
-const { fetch } = fetchContext;
-
-const MOCHA_ENV = (process.env.HELIX_FETCH_FORCE_HTTP1 === 'true');
-
-const fetchRetry = wrapFetch(fetch, {
-  retryDelay: (attempt) => {
-    if (MOCHA_ENV) {
-      return 1;
-    }
-    /* c8 ignore next */
-    return (2 ** attempt * 1000);
-  },
-  retryOn: async (attempt, error, response) => {
-    const retries = MOCHA_ENV ? 1 /* c8 ignore next */ : 2;
-    if (error) {
-      if (error instanceof FetchError) {
-        return attempt < retries;
-      }
-      throw error;
-    }
-    if (!response.ok) {
-      throw new Error(`Failed to send logs to ClickHouse with status ${response.status}: ${await response.text()}`);
-    }
-    return false;
-  },
-});
+const fetchRetry = createFetchRetry('ClickHouse');
 
 export class ClickHouseLogger {
   constructor(opts) {

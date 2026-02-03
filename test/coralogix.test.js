@@ -292,7 +292,7 @@ describe('Coralogix Tests', () => {
           event: 'INFO\tmessage\n',
         },
       }]),
-      /Failed to send logs with status 400: input malformed/,
+      /Failed to send logs to Coralogix with status 400: input malformed/,
     );
   });
 
