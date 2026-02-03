@@ -76,12 +76,16 @@ export class ClickHouseLogger {
 
   async sendPayload(entries) {
     const query = `INSERT INTO ${this._table} FORMAT JSONEachRow`;
-    const url = `https://${this._host}:8443/?database=${encodeURIComponent(this._database)}&query=${encodeURIComponent(query)}&async_insert=1&wait_for_async_insert=0`;
+    const url = new URL(`https://${this._host}:8443/`);
+    url.searchParams.set('database', this._database);
+    url.searchParams.set('query', query);
+    url.searchParams.set('async_insert', '1');
+    url.searchParams.set('wait_for_async_insert', '0');
     const auth = Buffer.from(`${this._user}:${this._password}`).toString('base64');
 
     const body = entries.map((entry) => JSON.stringify(entry)).join('\n');
 
-    const resp = await fetchRetry(new Request(url, {
+    const resp = await fetchRetry(new Request(url.href, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
